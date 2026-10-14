@@ -13,8 +13,8 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
       - run: pip install -r requirements.txt pytest
@@ -25,14 +25,36 @@ jobs:
     runs-on: ubuntu-latest
     environment: production
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: "22"
           cache: npm
-      - run: npm ci
-      # Builds the container image with Docker, pushes it to Cloudflare and deploys the Worker.
-      - run: npx wrangler deploy
+      - name: Check Cloudflare secrets
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          missing=""
+          [ -n "$CLOUDFLARE_API_TOKEN" ] || missing="$missing CLOUDFLARE_API_TOKEN"
+          [ -n "$CLOUDFLARE_ACCOUNT_ID" ] || missing="$missing CLOUDFLARE_ACCOUNT_ID"
+          if [ -n "$missing" ]; then
+            echo "::error title=Missing secrets::Add these repository secrets under Settings > Secrets and variables > Actions:$missing"
+            exit 1
+          fi
+      - run: npm ci
+      # Builds the container image with Docker, pushes it to Cloudflare and deploys the Worker.
+      # On failure the last lines of output are also posted as an annotation, visible on the run summary.
+      - name: Deploy with Wrangler
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          set -o pipefail
+          if ! npx wrangler deploy 2>&1 | tee deploy.log; then
+            msg=$(grep -v '^\s*$' deploy.log | tail -n 15 | sed 's/%/%25/g' | awk '{printf "%s%%0A", $0}')
+            echo "::error title=wrangler deploy failed::${msg}"
+            exit 1
+          fi
+          url=$(grep -oE 'https://[a-zA-Z0-9.-]+\.workers\.dev' deploy.log | head -n 1)
+          if [ -n "$url" ]; then echo "::notice title=Deployed::${url}"; fi
