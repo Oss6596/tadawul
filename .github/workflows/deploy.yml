@@ -58,3 +58,14 @@ jobs:
           fi
           url=$(grep -oE 'https://[a-zA-Z0-9.-]+\.workers\.dev' deploy.log | head -n 1)
           if [ -n "$url" ]; then echo "::notice title=Deployed::${url}"; fi
+      # On failure, show which accounts and permissions the token has (account IDs matching the secret print as ***).
+      - name: Diagnose Cloudflare token
+        if: failure()
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          verify=$(curl -s -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" https://api.cloudflare.com/client/v4/user/tokens/verify | jq -c '{success, status: .result.status, errors: [.errors[]?.message]}')
+          accounts=$(curl -s -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" "https://api.cloudflare.com/client/v4/accounts?per_page=50" | jq -r '[.result[]? | "\(.name) (\(.id))"] | join(", ")')
+          scripts=$(curl -s -o /dev/null -w "%{http_code}" -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/workers/scripts")
+          echo "::warning title=Token check::verify=${verify} | accounts the token can see: ${accounts:-none} | list Workers in configured account: HTTP ${scripts}"
