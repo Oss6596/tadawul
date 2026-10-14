@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tadawul Ichimoku</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%232a78d6'/><path d='M6 22c5-1 7-10 12-10s6 5 8 4' stroke='white' stroke-width='3' fill='none' stroke-linecap='round'/></svg>">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <script src="{{ url_for('static', filename='vendor/plotly.min.js') }}" defer></script>
+  <script src="{{ url_for('static', filename='app.js') }}" defer></script>
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <svg viewBox="0 0 32 32" width="28" height="28" aria-hidden="true"><rect width="32" height="32" rx="7" fill="var(--accent)"/><path d="M6 22c5-1 7-10 12-10s6 5 8 4" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round"/></svg>
+    <div>
+      <div class="brand-name">Tadawul Ichimoku</div>
+      <div class="brand-sub">Saudi Exchange · cloud analysis</div>
+    </div>
+  </div>
+  <nav class="tabs" role="tablist">
+    <button role="tab" data-view="analysis" aria-selected="true">Analysis</button>
+    <button role="tab" data-view="market" aria-selected="false">Market</button>
+    <button role="tab" data-view="scanner" aria-selected="false">Scanner</button>
+    <button role="tab" data-view="guide" aria-selected="false">Guide</button>
+  </nav>
+  <button class="icon-btn" id="themeBtn" title="Toggle light/dark theme" aria-label="Toggle theme">
+    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9z" fill="currentColor"/></svg>
+  </button>
+</header>
+
+<main>
+  <!-- ============================== ANALYSIS ============================== -->
+  <section id="view-analysis" class="view active">
+    <form id="searchForm" class="toolbar card" autocomplete="off">
+      <label class="field grow">
+        <span>Symbol</span>
+        <input id="symbolInput" name="symbol" list="symbolList" placeholder="e.g. 2222 (Saudi Aramco)" required pattern="[A-Za-z0-9]{1,10}">
+        <datalist id="symbolList"></datalist>
+      </label>
+      <label class="field">
+        <span>History</span>
+        <select id="daysSelect">
+          <option value="250">8 months</option>
+          <option value="400" selected>1 year+</option>
+          <option value="750">2 years</option>
+          <option value="1850">5 years</option>
+        </select>
+      </label>
+      <label class="field">
+        <span>Source</span>
+        <select id="sourceSelect">
+          <option value="auto">Auto</option>
+          <option value="tadawul">Saudi Exchange</option>
+          <option value="yahoo">Yahoo (.SR)</option>
+        </select>
+      </label>
+      <button class="btn primary" type="submit">Analyze</button>
+      <label class="btn ghost" title="Analyze a CSV with date, open, high, low, close, volume columns">
+        Upload CSV
+        <input type="file" id="csvInput" accept=".csv,text/csv" hidden>
+      </label>
+      <details class="params">
+        <summary>Parameters</summary>
+        <div class="param-grid">
+          <label class="field"><span>Tenkan</span><input type="number" id="pTenkan" value="9" min="2" max="200"></label>
+          <label class="field"><span>Kijun</span><input type="number" id="pKijun" value="26" min="2" max="200"></label>
+          <label class="field"><span>Senkou B</span><input type="number" id="pSenkouB" value="52" min="2" max="200"></label>
+          <label class="field"><span>Shift</span><input type="number" id="pShift" value="26" min="2" max="200"></label>
+        </div>
+      </details>
+    </form>
+
+    <div id="quickPicks" class="chips" aria-label="Popular symbols"></div>
+
+    <div id="analysisEmpty" class="empty card">
+      <h2>Analyze a Saudi stock with the Ichimoku cloud</h2>
+      <p>Enter a Tadawul symbol above, pick one of the popular names, or upload your own price CSV.
+        The app downloads daily prices, calculates Tenkan, Kijun, the Senkou spans and Chikou,
+        and scores five classic Ichimoku rules.</p>
+    </div>
+    <div id="analysisError" class="alert" hidden></div>
+    <div id="analysisLoading" class="loading" hidden><span class="spinner"></span> Fetching prices and calculating…</div>
+
+    <div id="analysisResult" hidden>
+      <div class="result-head">
+        <div>
+          <h1 id="rSymbol">—</h1>
+          <div class="muted" id="rName"></div>
+        </div>
+        <div class="price-block">
+          <div class="price" id="rClose">—</div>
+          <div id="rChange" class="delta"></div>
+          <div class="muted small" id="rMeta"></div>
+        </div>
+      </div>
+
+      <div class="grid-top">
+        <div class="card verdict-card">
+          <div class="card-label">Ichimoku verdict</div>
+          <div class="verdict" id="rVerdict">—</div>
+          <div class="meter" aria-hidden="true">
+            <div class="meter-track"><div class="meter-mid"></div><div class="meter-fill" id="rMeterFill"></div></div>
+            <div class="meter-scale"><span>−5</span><span>0</span><span>+5</span></div>
+          </div>
+          <div class="muted small">Score <strong id="rScore">0</strong> of ±5. Each rule adds +1 (bullish) or −1 (bearish).</div>
+          <p class="summary" id="rSummary"></p>
+        </div>
+        <div class="stats">
+          <div class="stat card"><div class="card-label"><i class="sw sw-tenkan"></i>Tenkan-sen</div><div class="stat-v" id="sTenkan">—</div></div>
+          <div class="stat card"><div class="card-label"><i class="sw sw-kijun"></i>Kijun-sen</div><div class="stat-v" id="sKijun">—</div></div>
+          <div class="stat card"><div class="card-label"><i class="sw sw-cloud"></i>Cloud now</div><div class="stat-v" id="sCloud">—</div></div>
+          <div class="stat card"><div class="card-label">52-week range</div><div class="stat-v" id="s52">—</div></div>
+        </div>
+      </div>
+
+      <div class="card chart-card">
+        <div class="chart-head">
+          <div class="card-label">Price and Ichimoku cloud</div>
+          <div class="seg" id="rangeSeg" role="group" aria-label="Chart range">
+            <button data-range="66">3M</button>
+            <button data-range="130" aria-pressed="true">6M</button>
+            <button data-range="260">1Y</button>
+            <button data-range="0">All</button>
+          </div>
+        </div>
+        <div class="legend" id="chartLegend">
+          <span><i class="lg-candle"></i>Price (hollow = up day)</span>
+          <span><i class="lg-line tenkan"></i>Tenkan</span>
+          <span><i class="lg-line kijun"></i>Kijun</span>
+          <span><i class="lg-line chikou"></i>Chikou</span>
+          <span><i class="lg-area bull"></i>Bullish cloud</span>
+          <span><i class="lg-area bear"></i>Bearish cloud</span>
+          <span><i class="lg-mark">▲▼</i>TK cross</span>
+        </div>
+        <div id="chart" class="chart" role="img" aria-label="Candlestick chart with Ichimoku lines and cloud"></div>
+      </div>
+
+      <div class="grid-bottom">
+        <div class="card">
+          <div class="card-label">Signals</div>
+          <ul class="signals" id="rSignals"></ul>
+        </div>
+        <div class="card">
+          <div class="card-label">Tenkan/Kijun crosses</div>
+          <table class="table compact" id="crossTable">
+            <thead><tr><th>Date</th><th>Type</th><th class="num">Level</th></tr></thead>
+            <tbody></tbody>
+          </table>
+          <div class="muted small" id="crossEmpty" hidden>No crosses in this period.</div>
+        </div>
+      </div>
+
+      <details class="card data-view">
+        <summary>Data table (last 30 sessions)</summary>
+        <div class="table-wrap">
+          <table class="table compact" id="dataTable">
+            <thead><tr><th>Date</th><th class="num">Open</th><th class="num">High</th><th class="num">Low</th><th class="num">Close</th><th class="num">Volume</th><th class="num">Tenkan</th><th class="num">Kijun</th><th class="num">Span A</th><th class="num">Span B</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <!-- ============================== MARKET ============================== -->
+  <section id="view-market" class="view">
+    <div class="toolbar card">
+      <label class="field grow"><span>Filter</span><input id="marketFilter" placeholder="Symbol or company name"></label>
+      <button class="btn ghost" id="marketRefresh" type="button">Refresh</button>
+      <div class="muted small" id="marketMeta"></div>
+    </div>
+    <div class="stats market-stats" id="marketStats" hidden>
+      <div class="stat card"><div class="card-label">Companies</div><div class="stat-v" id="mCount">—</div></div>
+      <div class="stat card"><div class="card-label">▲ Advancing</div><div class="stat-v up" id="mUp">—</div></div>
+      <div class="stat card"><div class="card-label">▼ Declining</div><div class="stat-v down" id="mDown">—</div></div>
+      <div class="stat card"><div class="card-label">Unchanged</div><div class="stat-v" id="mFlat">—</div></div>
+    </div>
+    <div id="marketError" class="alert" hidden></div>
+    <div id="marketLoading" class="loading" hidden><span class="spinner"></span> Loading market prices…</div>
+    <div class="card table-wrap">
+      <table class="table sortable" id="marketTable">
+        <thead><tr>
+          <th data-key="symbol">Symbol</th><th data-key="name">Company</th>
+          <th data-key="price" class="num">Price</th><th data-key="change" class="num">Change</th>
+          <th data-key="change_pct" class="num">Change %</th><th></th>
+        </tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============================== SCANNER ============================== -->
+  <section id="view-scanner" class="view">
+    <form class="toolbar card" id="scanForm">
+      <label class="field grow"><span>Symbols (comma separated, max 30)</span>
+        <input id="scanSymbols" value="{{ watchlist }}">
+      </label>
+      <button class="btn primary" type="submit">Run scan</button>
+    </form>
+    <div id="scanError" class="alert" hidden></div>
+    <div id="scanLoading" class="loading" hidden><span class="spinner"></span> Scanning… each symbol is fetched in turn, so this can take a while.</div>
+    <div class="card table-wrap">
+      <table class="table" id="scanTable">
+        <thead><tr>
+          <th>Symbol</th><th>Company</th><th class="num">Close</th><th class="num">Chg %</th>
+          <th>Last 60 sessions</th><th title="Cloud · TK · Kijun · Future cloud · Chikou">Rules</th><th>Score</th><th>Verdict</th>
+        </tr></thead>
+        <tbody><tr><td colspan="8" class="muted">Press <strong>Run scan</strong> to rank the watchlist by Ichimoku score.</td></tr></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============================== GUIDE ============================== -->
+  <section id="view-guide" class="view">
+    <div class="card prose">
+      <h2>Reading the Ichimoku cloud</h2>
+      <p><em>Ichimoku Kinko Hyo</em> ("one-glance equilibrium chart") shows trend, momentum and
+        support/resistance in one view. This app uses the standard 9 / 26 / 52 settings, which you can change
+        under <strong>Parameters</strong>.</p>
+      <table class="table">
+        <thead><tr><th>Line</th><th>Calculation</th><th>Meaning</th></tr></thead>
+        <tbody>
+          <tr><td><i class="sw sw-tenkan"></i>Tenkan-sen</td><td>(9-day high + 9-day low) ÷ 2</td><td>Short-term balance; fast signal line</td></tr>
+          <tr><td><i class="sw sw-kijun"></i>Kijun-sen</td><td>(26-day high + 26-day low) ÷ 2</td><td>Medium-term balance; support/resistance</td></tr>
+          <tr><td><i class="sw sw-cloud"></i>Senkou Span A</td><td>(Tenkan + Kijun) ÷ 2, shifted 26 days ahead</td><td>Fast edge of the cloud</td></tr>
+          <tr><td><i class="sw sw-cloud"></i>Senkou Span B</td><td>(52-day high + 52-day low) ÷ 2, shifted 26 days ahead</td><td>Slow edge of the cloud</td></tr>
+          <tr><td><i class="sw sw-chikou"></i>Chikou Span</td><td>Close, shifted 26 days back</td><td>Confirms the trend against past prices</td></tr>
+        </tbody>
+      </table>
+      <h3>The five rules behind the score</h3>
+      <ol>
+        <li><strong>Price vs cloud:</strong> above the cloud is bullish, below is bearish, inside means no clear trend.</li>
+        <li><strong>Tenkan vs Kijun:</strong> Tenkan above Kijun is bullish. A fresh cross (▲/▼ on the chart) is a classic entry signal.</li>
+        <li><strong>Price vs Kijun:</strong> closing above the base line shows upward momentum.</li>
+        <li><strong>Future cloud:</strong> Span A above Span B 26 days ahead (green cloud) points to a bullish outlook.</li>
+        <li><strong>Chikou:</strong> today's close above the close 26 sessions ago confirms the trend.</li>
+      </ol>
+      <p>A total of +3 or more is <strong>strong bullish</strong>, −3 or less is <strong>strong bearish</strong>.
+        Signals are strongest when all five agree. A thin cloud is weak support or resistance.</p>
+      <p class="muted small">Educational tool only, not investment advice. Data is scraped from public pages and may be
+        delayed or incomplete.</p>
+    </div>
+  </section>
+</main>
+
+<footer class="footer muted small">
+  Data from saudiexchange.sa (Yahoo Finance as fallback) · Ichimoku 9/26/52 · Not investment advice
+</footer>
+</body>
+</html>

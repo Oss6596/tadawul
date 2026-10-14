@@ -1,0 +1,19 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "tadawul-ichimoku",
+  "main": "src/worker.js",
+  "compatibility_date": "2026-09-01",
+  "observability": { "enabled": true },
+  "containers": [
+    {
+      "class_name": "IchimokuContainer",
+      "image": "./Dockerfile",
+      "instance_type": "basic",
+      "max_instances": 2
+    }
+  ],
+  "durable_objects": {
+    "bindings": [{ "class_name": "IchimokuContainer", "name": "ICHIMOKU" }]
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["IchimokuContainer"] }]
+}

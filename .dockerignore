@@ -1,0 +1,4 @@
+*
+!requirements-web.txt
+!tadawul_ichimoku/**
+**/__pycache__
