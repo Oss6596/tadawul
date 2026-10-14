@@ -65,6 +65,18 @@ docker build --platform linux/amd64 --secret id=ca_bundle,src=/path/to/ca-bundle
 npx wrangler deploy
 ```
 
+## Automatic deploys from GitHub
+
+`.github/workflows/deploy.yml` runs the tests and then `wrangler deploy` on every push to `main`. You can also
+start it by hand under Actions → *Test and deploy to Cloudflare* → **Run workflow**. To set it up, add two
+repository secrets under GitHub → Settings → Secrets and variables → Actions:
+
+* `CLOUDFLARE_API_TOKEN`
+* `CLOUDFLARE_ACCOUNT_ID`
+
+The deploy job uses the GitHub environment `production`. Add required reviewers to that environment if every
+deploy should wait for approval.
+
 ## 4. Custom domain (optional)
 
 Workers & Pages → `tadawul-ichimoku` → **Settings → Domains & Routes → Add → Custom domain**, for example
