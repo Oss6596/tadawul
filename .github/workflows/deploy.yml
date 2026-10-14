@@ -58,6 +58,27 @@ jobs:
           fi
           url=$(grep -oE 'https://[a-zA-Z0-9.-]+\.workers\.dev' deploy.log | head -n 1)
           if [ -n "$url" ]; then echo "::notice title=Deployed::${url}"; fi
+      # After deploying, wait for the container and check the live site and both data sources.
+      - name: Smoke test the live site
+        run: |
+          url=$(grep -oE 'https://[a-zA-Z0-9.-]+\.workers\.dev' deploy.log | head -n 1)
+          [ -n "$url" ] || { echo "::warning title=Smoke test::no workers.dev URL found in deploy output"; exit 0; }
+          ok=""
+          for i in $(seq 1 30); do
+            if curl -fsS --max-time 20 "$url/healthz" >/dev/null 2>&1; then ok=1; break; fi
+            sleep 10
+          done
+          [ -n "$ok" ] || { echo "::error title=Smoke test::$url/healthz did not respond within 5 minutes"; exit 1; }
+          check() {
+            code=$(curl -s -o body.json -w "%{http_code}" --max-time 150 "$url$1")
+            info=$(jq -r 'if .error then "error: \(.error|tostring|.[0:300])" elif .report then "\(.symbol) close \(.report.close) on \(.report.date), \(.report.verdict) (source \(.source))" elif .count then "\(.count) companies" else "ok" end' body.json 2>/dev/null | tr '\n' ' ')
+            echo "::notice title=$2::HTTP $code - $info"
+          }
+          echo "::notice title=Site::$url is up"
+          check "/api/analyze/2222?source=tadawul" "Saudi Exchange source (2222)"
+          check "/api/analyze/2222?source=yahoo" "Yahoo source (2222)"
+          check "/api/market" "Market feed"
+
       # On failure, show which accounts and permissions the token has (account IDs matching the secret print as ***).
       - name: Diagnose Cloudflare token
         if: failure()
