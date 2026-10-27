@@ -1,0 +1,35 @@
+name: Deploy Family Brain Cup
+
+# Publishes the static game in family-game/ to Cloudflare Pages (free plan).
+# Uses the same CLOUDFLARE_API_TOKEN / CLOUDFLARE_ACCOUNT_ID secrets as the main deploy;
+# the token needs the "Account > Cloudflare Pages > Edit" permission.
+on:
+  push:
+    branches: [main]
+    paths: ["family-game/**", ".github/workflows/family-game.yml"]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-family-game
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci
+      - name: Deploy to Cloudflare Pages
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          set -o pipefail
+          # First run creates the project; later runs report it already exists.
+          npx wrangler pages project create family-brain-cup --production-branch main 2>/dev/null || true
+          npx wrangler pages deploy family-game --project-name family-brain-cup --branch main --commit-dirty=true 2>&1 | tee deploy.log
+          echo "::notice title=Game is live::https://family-brain-cup.pages.dev"

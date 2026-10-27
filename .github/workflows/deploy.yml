@@ -3,6 +3,7 @@ name: Test and deploy to Cloudflare
 on:
   push:
     branches: [main]
+    paths-ignore: ["family-game/**", ".github/workflows/family-game.yml"]
   workflow_dispatch:
 
 concurrency:
