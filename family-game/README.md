@@ -18,7 +18,11 @@ Each turn scores up to 100 points, with bonus points for speed.
 * **Practice**: one player, one game, tracking personal bests.
 * **Hall of fame**: cups won and each player's best score in every game.
 
-Players (name, age, animal avatar) and scores are saved on the device. Arabic names work too.
+**English and Arabic.** Tap **ع** / **EN** on the home screen to switch. Arabic mode has a full right-to-left layout,
+Arabic word lists for every level (قطة 🐱, كوكب, خوارزمية …), the Arabic alphabet in letter patterns and Arabic-Indic digits (١٢٣).
+The game starts in Arabic on devices set to Arabic.
+
+Players (name, age, animal avatar) and scores are saved on the device.
 
 It is a plain web app (HTML + JavaScript, no build step). It works offline once it has been opened,
 and it can be installed to the home screen like a normal app.

@@ -24,7 +24,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@600;700;800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Baloo+Bhaijaan+2:wght@600;700;800&family=Cairo:wght@600;700;800&family=Nunito:wght@600;700;800&display=swap">
 <style>
 /* Layout: one centred column like a game table at night; menus scroll, play screens fit one viewport. */
 :root {
@@ -48,6 +48,14 @@
   --r: 18px;
   color-scheme: dark;
 }
+:root[lang="ar"] {
+  --f-display: "Baloo Bhaijaan 2", "Baloo 2", "Geeza Pro", "Noto Sans Arabic", system-ui, sans-serif;
+  --f-body: "Cairo", "Nunito", "Geeza Pro", "Noto Sans Arabic", system-ui, sans-serif;
+}
+/* Arabic letters must stay joined: no tracking, no case transforms. */
+:root[lang="ar"] * { letter-spacing: 0 !important; text-transform: none !important }
+:root[lang="ar"] h1, :root[lang="ar"] h2, :root[lang="ar"] h3 { line-height: 1.35 }
+[dir="rtl"] .timer i, [dir="rtl"] .stand .track i { transform-origin: right }
 html, body { height: 100% }
 body {
   background:
@@ -88,6 +96,7 @@ h1, h2, h3 { font-family: var(--f-display); font-weight: 800; line-height: 1.05;
 }
 .icon-btn svg { width: 22px; height: 22px; fill: none; stroke: var(--ink); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round }
 .icon-btn[aria-pressed="false"] svg { stroke: var(--muted) }
+.lang-btn { font-family: "Baloo Bhaijaan 2", "Baloo 2", system-ui, sans-serif; font-size: 18px; font-weight: 800; letter-spacing: 0 !important }
 main { flex: 1; display: flex; flex-direction: column; gap: 22px; padding-top: 8px }
 
 /* Buttons */
@@ -124,7 +133,7 @@ main { flex: 1; display: flex; flex-direction: column; gap: 22px; padding-top: 8
 
 .players { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px }
 .pcard {
-  display: flex; align-items: center; gap: 10px; text-align: left;
+  display: flex; align-items: center; gap: 10px; text-align: start;
   border: 2px solid var(--line); border-radius: var(--r); background: var(--board-2);
   padding: 10px 12px; min-height: 64px; min-width: 0;
 }
@@ -156,7 +165,7 @@ main { flex: 1; display: flex; flex-direction: column; gap: 22px; padding-top: 8
 
 .games { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px }
 .gtile {
-  display: flex; gap: 12px; align-items: center; text-align: left;
+  display: flex; gap: 12px; align-items: center; text-align: start;
   padding: 12px; border-radius: var(--r); background: var(--board-2); border: 2px solid transparent; min-width: 0;
 }
 .gtile .gicon {
@@ -201,7 +210,7 @@ main { flex: 1; display: flex; flex-direction: column; gap: 22px; padding-top: 8
 .seg button[aria-pressed="true"] { border-color: var(--t, var(--sun)); background: color-mix(in srgb, var(--t, var(--sun)) 20%, var(--board-2)) }
 .seg.numbers button b { font-size: 26px }
 .pick-players { display: flex; flex-wrap: wrap; gap: 8px }
-.pick-players button { display: flex; align-items: center; gap: 8px; padding: 6px 14px 6px 6px; border-radius: 999px; border: 2px solid var(--line); background: var(--board-2); font-family: var(--f-display); font-size: 18px; min-height: 52px }
+.pick-players button { display: flex; align-items: center; gap: 8px; padding-block: 6px; padding-inline: 6px 14px; border-radius: 999px; border: 2px solid var(--line); background: var(--board-2); font-family: var(--f-display); font-size: 18px; min-height: 52px }
 .pick-players button .avatar { width: 38px; height: 38px; font-size: 22px }
 .pick-players button[aria-pressed="true"] { border-color: var(--t) }
 .pick-players button[aria-pressed="false"] { opacity: .5 }
@@ -212,20 +221,20 @@ main { flex: 1; display: flex; flex-direction: column; gap: 22px; padding-top: 8
 .center p { margin: 0; color: var(--muted); max-width: 36ch }
 .big-icon { width: 112px; height: 112px; border-radius: 30px; display: grid; place-items: center; font-size: 62px; background: var(--g); box-shadow: 0 8px 0 rgba(0,0,0,.3) }
 .lineup { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px }
-.lineup .pill { display: flex; align-items: center; gap: 6px; padding: 4px 12px 4px 4px; border-radius: 999px; background: var(--board-2) }
+.lineup .pill { display: flex; align-items: center; gap: 6px; padding-block: 4px; padding-inline: 4px 12px; border-radius: 999px; background: var(--board-2) }
 .lineup .avatar { width: 34px; height: 34px; font-size: 20px }
 .points { font-family: var(--f-display); font-size: clamp(64px, 18vw, 110px); line-height: 1; color: var(--sun); font-variant-numeric: tabular-nums }
 .detail { list-style: none; padding: 0; margin: 0; color: var(--muted) }
 
 .standings { display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 520px }
-.stand { display: grid; grid-template-columns: 28px 46px 1fr auto; gap: 10px; align-items: center; text-align: left }
+.stand { display: grid; grid-template-columns: 28px 46px 1fr auto; gap: 10px; align-items: center; text-align: start }
 .stand .rank { font-family: var(--f-display); font-size: 22px; color: var(--muted) }
 .stand .bar-wrap { min-width: 0 }
 .stand .nm { font-family: var(--f-display); font-size: 19px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis }
 .stand .track { height: 10px; border-radius: 6px; background: var(--board-3); overflow: hidden }
 .stand .track i { display: block; height: 100%; background: var(--t); border-radius: 6px; transform-origin: left; animation: grow .8s ease-out both }
 .stand .sc { font-family: var(--f-display); font-size: 24px; font-variant-numeric: tabular-nums }
-.stand .sc small { display: block; font-size: 13px; color: var(--mint); text-align: right; font-family: var(--f-body) }
+.stand .sc small { display: block; font-size: 13px; color: var(--mint); text-align: end; font-family: var(--f-body) }
 @keyframes grow { from { transform: scaleX(0) } }
 
 .podium { display: flex; align-items: flex-end; justify-content: center; gap: 10px; width: 100%; max-width: 520px }
@@ -283,6 +292,7 @@ main { flex: 1; display: flex; flex-direction: column; gap: 22px; padding-top: 8
 }
 .slot { border: 0; background: var(--board-2); border-bottom: 4px solid var(--line) }
 .slot.locked { color: var(--mint) }
+.joined { font-family: var(--f-display); font-size: 40px; min-height: 1.4em; color: var(--mint) }
 .slots.ok .slot { background: var(--good); color: #002A1C }
 .slots.no { animation: shake .4s }
 .tile { border: 0; background: var(--ink); color: var(--board); box-shadow: 0 5px 0 #B9A98C }
@@ -308,9 +318,9 @@ main { flex: 1; display: flex; flex-direction: column; gap: 22px; padding-top: 8
 
 .table-wrap { overflow-x: auto; width: 100% }
 table.fame { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums }
-.fame th { font-size: 12px; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); text-align: right; padding: 6px 8px; font-weight: 800 }
-.fame th:first-child, .fame td:first-child { text-align: left }
-.fame td { padding: 10px 8px; border-top: 1px solid var(--line); text-align: right; font-size: 17px }
+.fame th { font-size: 12px; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); text-align: end; padding: 6px 8px; font-weight: 800 }
+.fame th:first-child, .fame td:first-child { text-align: start }
+.fame td { padding: 10px 8px; border-top: 1px solid var(--line); text-align: end; font-size: 17px }
 .fame .who { display: flex; align-items: center; gap: 8px; font-family: var(--f-display); font-size: 19px; white-space: nowrap }
 .fame .avatar { width: 34px; height: 34px; font-size: 20px }
 
@@ -322,7 +332,7 @@ table.fame { border-collapse: collapse; width: 100%; font-variant-numeric: tabul
 
 @media (max-width: 560px) {
   .levels { grid-template-columns: 1fr }
-  .level { display: grid; grid-template-columns: 110px 1fr; gap: 4px 12px; border-top: 0; border-left: 6px solid var(--t) }
+  .level { display: grid; grid-template-columns: 110px 1fr; gap: 4px 12px; border-top: 0; border-inline-start: 6px solid var(--t) }
   .level p { margin: 0; grid-column: 2; grid-row: 1 / span 2; align-self: center }
   .form-grid { grid-template-columns: 1fr 96px }
   .choice { min-height: 76px }
@@ -341,6 +351,7 @@ table.fame { border-collapse: collapse; width: 100%; font-variant-numeric: tabul
       <svg viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 9.5V20h13V9.5"/></svg>
     </button>
     <div class="bar-title" id="barTitle"></div>
+    <button class="icon-btn lang-btn" id="langBtn" aria-label="العربية">ع</button>
     <button class="icon-btn" id="soundBtn" aria-label="Sound" aria-pressed="true">
       <svg viewBox="0 0 24 24"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path class="wave" d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/></svg>
     </button>
@@ -367,33 +378,148 @@ const store = {
   set(k, v) { try { localStorage.setItem('fbc.' + k, JSON.stringify(v)); } catch { /* storage unavailable */ } },
 };
 
-/* ---------- data ---------- */
-const TIERS = {
-  star:     { name: 'Little Star', ages: 'Ages 5–8',  blurb: 'Counting, simple sums, 3-letter words, colour patterns' },
-  explorer: { name: 'Explorer',    ages: 'Ages 9–14', blurb: 'Times tables, number sequences, longer words' },
-  master:   { name: 'Master',      ages: 'Ages 15+',  blurb: 'Mental maths, percentages, tricky patterns, big words' },
+/* ---------- text ---------- */
+// Arabic strings use Western digits in the source; they are shown as Arabic-Indic digits on screen (see localize below).
+const L = {
+  en: {
+    appName: 'Family Brain Cup',
+    tagline: 'Five quick brain games. Everyone plays at their own level, so the youngest can beat the grown-ups.',
+    players: 'Players',
+    playerCount: n => n === 1 ? '1 player' : `${n} players`,
+    addEveryone: 'Add everyone who will play',
+    addPlayerCard: '+ Add player',
+    startCup: 'Start a family cup',
+    practice: 'Practice',
+    fame: 'Hall of fame',
+    install: 'Install on this device',
+    iosTip: 'Play it like an app: tap <b>Share</b> then <b>Add to Home Screen</b>. It works offline after that.',
+    threeLevels: 'Three levels',
+    fiveGames: 'Five games',
+    tiers: {
+      star: { name: 'Little Star', ages: 'Ages 5–8', blurb: 'Counting, simple sums, 3-letter words, colour patterns' },
+      explorer: { name: 'Explorer', ages: 'Ages 9–14', blurb: 'Times tables, number sequences, longer words' },
+      master: { name: 'Master', ages: 'Ages 15+', blurb: 'Mental maths, percentages, tricky patterns, big words' },
+    },
+    games: {
+      math: { name: 'Number Sprint', how: 'Answer 5 sums before the clock runs out.' },
+      memory: { name: 'Memory Match', how: 'Flip two cards at a time and find every pair.' },
+      words: { name: 'Word Builder', how: 'Tap the letters in order to spell the word.' },
+      pattern: { name: 'What Comes Next?', how: 'Work out the next item in the pattern.' },
+      eyes: { name: 'Sharp Eyes', how: 'Spot the one picture that is different.' },
+    },
+    editPlayer: 'Edit player', newPlayer: 'New player', name: 'Name', namePh: 'e.g. Sara', age: 'Age', level: 'Level',
+    pickAnimal: 'Pick an animal', remove: 'Remove', save: 'Save', addPlayer: 'Add player', cancel: 'Cancel',
+    removeQ: n => `Remove ${n} and their trophies?`,
+    newCup: 'New cup', whoPlaying: 'Who is playing?', rounds: 'Rounds', roundTime: ['about 5 min', 'about 10 min', 'about 15 min'],
+    gamesInCup: 'Games in this cup', startTheCup: 'Start the cup',
+    roundOf: (r, n) => `Round ${r} of ${n}`, round: r => `Round ${r}`,
+    ownLevel: 'Each player gets puzzles for their own level.', letsGo: "Let's go",
+    passTo: 'Pass the device to', yourTurn: 'Your turn', ready: "I'm ready",
+    scored: n => `${n} scored`, cupTotal: 'Cup total:', nextP: n => `Next: ${n}`, seeScores: 'See the scores',
+    afterRound: (r, n) => `After round ${r} of ${n}`, scoreboard: 'Scoreboard', crown: 'Crown the winner', nextRound: (r, g) => `Round ${r}: ${g}`,
+    cupFinished: 'Cup finished', shared: 'A shared victory', goesTo: 'The cup goes to', and: ' & ', home: 'Home', playAgain: 'Play again',
+    whoPractising: 'Who is practising?', pickGame: 'Pick a game', otherGames: 'Other games',
+    newBest: p => `New personal best! Old best was ${p}.`, firstScore: 'First score on the board!', bestWas: p => `Personal best: ${p}`,
+    fameNote: "Game columns show each player's best score, out of about 100.", noPlayers: 'No players yet. Add your family on the home screen.',
+    thPlayer: 'Player', thCups: 'Cups', thPlayed: 'Played', thBest: g => `Best ${g}`,
+    leaveCup: 'Leave this cup? The scores so far will be lost.', stopGame: 'Stop this game?', leave: 'Leave', keepPlaying: 'Keep playing',
+    question: (i, n) => `Question ${i} of ${n}`, correct: (r, n) => `${r} of ${n} correct`,
+    howMany: 'How many?', biggest: 'Which number is the biggest?', pctOf: (p, n) => `${p}% of ${n}`, fracOf: (m, d, x) => `${m}/${d} of ${x}`,
+    whatNext: 'What comes next?', ask: '?',
+    wordOf: (w, n) => `Word ${w} of ${n}`, hint: 'Hint', skip: 'Skip', letterN: i => `Letter ${i}`, spelled: (s, n) => `${s} of ${n} words spelled`,
+    findPairs: n => `Find ${n} pairs`, pairsOf: (f, n) => `${f} of ${n} pairs`, pairsFound: (f, n) => `${f} of ${n} pairs found`, moves: m => `${m} moves`, cardN: i => `Card ${i}`,
+    findOdd: (r, n) => `Find the different one · ${r} of ${n}`, spotted: (r, n) => `${r} of ${n} spotted`,
+    homeBtn: 'Home', soundOn: 'Sound on', soundOff: 'Sound off', switchLang: 'العربية',
+  },
+  ar: {
+    appName: 'كأس الأذكياء',
+    tagline: 'خمس ألعاب ذكاء سريعة. كل لاعب يلعب حسب مستواه، لذلك يستطيع الأصغر أن يفوز على الكبار.',
+    players: 'اللاعبون',
+    playerCount: n => n === 1 ? 'لاعب واحد' : n === 2 ? 'لاعبان' : n <= 10 ? `${n} لاعبين` : `${n} لاعبًا`,
+    addEveryone: 'أضف كل من سيلعب',
+    addPlayerCard: '+ إضافة لاعب',
+    startCup: 'ابدأ كأس العائلة',
+    practice: 'تدريب',
+    fame: 'لوحة الأبطال',
+    install: 'ثبّت اللعبة على هذا الجهاز',
+    iosTip: 'العبها كتطبيق: اضغط <b>مشاركة</b> ثم <b>إضافة إلى الشاشة الرئيسية</b>. بعدها تعمل بدون إنترنت.',
+    threeLevels: 'ثلاثة مستويات',
+    fiveGames: 'خمس ألعاب',
+    tiers: {
+      star: { name: 'نجمة صغيرة', ages: 'من 5 إلى 8 سنوات', blurb: 'العدّ، جمع وطرح بسيط، كلمات من 3 حروف، أنماط الألوان' },
+      explorer: { name: 'مستكشف', ages: 'من 9 إلى 14 سنة', blurb: 'جدول الضرب، متتاليات الأعداد، كلمات أطول' },
+      master: { name: 'خبير', ages: '15 سنة فأكثر', blurb: 'حساب ذهني، نسب مئوية، أنماط صعبة، كلمات طويلة' },
+    },
+    games: {
+      math: { name: 'سباق الأرقام', how: 'أجب عن 5 مسائل قبل انتهاء الوقت.' },
+      memory: { name: 'لعبة الذاكرة', how: 'اقلب بطاقتين في كل مرة وابحث عن كل الأزواج.' },
+      words: { name: 'بنّاء الكلمات', how: 'اضغط على الحروف بالترتيب لتكوين الكلمة.' },
+      pattern: { name: 'ماذا بعد؟', how: 'اكتشف العنصر التالي في النمط.' },
+      eyes: { name: 'عين الصقر', how: 'جد الصورة الوحيدة المختلفة.' },
+    },
+    editPlayer: 'تعديل لاعب', newPlayer: 'لاعب جديد', name: 'الاسم', namePh: 'مثلًا: سارة', age: 'العمر', level: 'المستوى',
+    pickAnimal: 'اختر حيوانًا', remove: 'حذف', save: 'حفظ', addPlayer: 'إضافة اللاعب', cancel: 'إلغاء',
+    removeQ: n => `حذف «${n}» مع كل النتائج والكؤوس؟`,
+    newCup: 'كأس جديدة', whoPlaying: 'من سيلعب؟', rounds: 'عدد الجولات', roundTime: ['حوالي 5 دقائق', 'حوالي 10 دقائق', 'حوالي 15 دقيقة'],
+    gamesInCup: 'ألعاب هذه الكأس', startTheCup: 'ابدأ الكأس',
+    roundOf: (r, n) => `الجولة ${r} من ${n}`, round: r => `الجولة ${r}`,
+    ownLevel: 'كل لاعب يحصل على ألغاز تناسب مستواه.', letsGo: 'هيا بنا',
+    passTo: 'أعطِ الجهاز إلى', yourTurn: 'دورك', ready: 'ابدأ',
+    scored: n => `نتيجة ${n}`, cupTotal: 'المجموع في الكأس:', nextP: n => `التالي: ${n}`, seeScores: 'شاهد النتائج',
+    afterRound: (r, n) => `بعد الجولة ${r} من ${n}`, scoreboard: 'لوحة النتائج', crown: 'توّج الفائز', nextRound: (r, g) => `الجولة ${r}: ${g}`,
+    cupFinished: 'انتهت الكأس', shared: 'فوز مشترك', goesTo: 'الكأس من نصيب', and: ' و', home: 'الرئيسية', playAgain: 'العب مرة أخرى',
+    whoPractising: 'من سيتدرب؟', pickGame: 'اختر لعبة', otherGames: 'ألعاب أخرى',
+    newBest: p => `رقم قياسي جديد! أفضل نتيجة سابقة كانت ${p}.`, firstScore: 'أول نتيجة مسجلة!', bestWas: p => `أفضل نتيجة: ${p}`,
+    fameNote: 'أعمدة الألعاب تعرض أفضل نتيجة لكل لاعب، من حوالي 100.', noPlayers: 'لا يوجد لاعبون بعد. أضف عائلتك من الشاشة الرئيسية.',
+    thPlayer: 'اللاعب', thCups: 'الكؤوس', thPlayed: 'المباريات', thBest: g => `أفضل نتيجة في ${g}`,
+    leaveCup: 'الخروج من الكأس؟ ستضيع النتائج الحالية.', stopGame: 'إيقاف هذه اللعبة؟', leave: 'خروج', keepPlaying: 'متابعة اللعب',
+    question: (i, n) => `السؤال ${i} من ${n}`, correct: (r, n) => `إجابات صحيحة: ${r} من ${n}`,
+    howMany: 'كم عددها؟', biggest: 'أي عدد هو الأكبر؟', pctOf: (p, n) => `${p}٪ من ${n}`, fracOf: (m, d, x) => `${m}/${d} من ${x}`,
+    whatNext: 'ماذا بعد؟', ask: '؟',
+    wordOf: (w, n) => `الكلمة ${w} من ${n}`, hint: 'تلميح', skip: 'تخطَّ', letterN: i => `الحرف ${i}`, spelled: (s, n) => `كلمات صحيحة: ${s} من ${n}`,
+    findPairs: n => `الأزواج المطلوبة: ${n}`, pairsOf: (f, n) => `الأزواج: ${f} من ${n}`, pairsFound: (f, n) => `الأزواج المكتشفة: ${f} من ${n}`, moves: m => `عدد الحركات: ${m}`, cardN: i => `البطاقة ${i}`,
+    findOdd: (r, n) => `جد المختلف · ${r} من ${n}`, spotted: (r, n) => `اكتشفت ${r} من ${n}`,
+    homeBtn: 'الرئيسية', soundOn: 'الصوت يعمل', soundOff: 'الصوت مغلق', switchLang: 'English',
+  },
 };
+
+const GAME_IDS = ['math', 'memory', 'words', 'pattern', 'eyes'];
+const GAME_ICONS = { math: '🔢', memory: '🃏', words: '🔤', pattern: '🧩', eyes: '👀' };
+const TIER_IDS = ['star', 'explorer', 'master'];
 const tierForAge = a => a <= 8 ? 'star' : a <= 14 ? 'explorer' : 'master';
 const AVATARS = ['🦊', '🐼', '🐯', '🦁', '🐸', '🐵', '🦄', '🐙', '🐧', '🐨', '🐲', '🦖'];
 
-const GAMES = {
-  math:    { name: 'Number Sprint',    icon: '🔢', how: 'Answer 5 sums before the clock runs out.' },
-  memory:  { name: 'Memory Match',     icon: '🃏', how: 'Flip two cards at a time and find every pair.' },
-  words:   { name: 'Word Builder',     icon: '🔤', how: 'Tap the letters in order to spell the word.' },
-  pattern: { name: 'What Comes Next?', icon: '🧩', how: 'Work out the next item in the pattern.' },
-  eyes:    { name: 'Sharp Eyes',       icon: '👀', how: 'Spot the one picture that is different.' },
-};
-
 /* ---------- state ---------- */
+const defaultLang = () => { try { return (navigator.language || '').toLowerCase().startsWith('ar') ? 'ar' : 'en'; } catch { return 'en'; } };
 const S = {
   players: store.get('players', []),
   sound: store.get('sound', true),
+  lang: store.get('lang', null) || defaultLang(),
   cup: null,
   cleanup: null,
   inPlay: false,
 };
 const savePlayers = () => store.set('players', S.players);
 const byId = id => S.players.find(p => p.id === id);
+
+const t = (k, ...a) => { const v = L[S.lang][k] ?? L.en[k]; return typeof v === 'function' ? v(...a) : v; };
+const tier = id => t('tiers')[id];
+const game = id => ({ icon: GAME_ICONS[id], ...t('games')[id] });
+
+/* Arabic-Indic digits for everything shown on screen while Arabic is on */
+const AR_DIGITS = '٠١٢٣٤٥٦٧٨٩';
+const localize = node => {
+  if (S.lang !== 'ar') return;
+  if (node.nodeType === 3) {
+    const tag = node.parentNode && node.parentNode.nodeName;
+    if (tag !== 'STYLE' && tag !== 'SCRIPT' && /[0-9]/.test(node.data)) node.data = node.data.replace(/[0-9]/g, d => AR_DIGITS[d]);
+    return;
+  }
+  if (node.nodeType === 1 && node.nodeName !== 'STYLE' && node.nodeName !== 'SCRIPT') node.childNodes.forEach(localize);
+};
+new MutationObserver(muts => muts.forEach(m => {
+  if (m.type === 'characterData') localize(m.target); else m.addedNodes.forEach(localize);
+})).observe(document.body, { childList: true, subtree: true, characterData: true });
 
 /* ---------- sound ---------- */
 const Sound = (() => {
@@ -408,12 +534,12 @@ const Sound = (() => {
   };
   const tone = (freq, dur = .12, type = 'sine', when = 0, vol = .15) => {
     const c = ensure(); if (!c) return;
-    const t = c.currentTime + when, o = c.createOscillator(), g = c.createGain();
-    o.type = type; o.frequency.setValueAtTime(freq, t);
-    g.gain.setValueAtTime(.0001, t);
-    g.gain.exponentialRampToValueAtTime(vol, t + .01);
-    g.gain.exponentialRampToValueAtTime(.0001, t + dur);
-    o.connect(g).connect(c.destination); o.start(t); o.stop(t + dur + .02);
+    const t0 = c.currentTime + when, o = c.createOscillator(), g = c.createGain();
+    o.type = type; o.frequency.setValueAtTime(freq, t0);
+    g.gain.setValueAtTime(.0001, t0);
+    g.gain.exponentialRampToValueAtTime(vol, t0 + .01);
+    g.gain.exponentialRampToValueAtTime(.0001, t0 + dur);
+    o.connect(g).connect(c.destination); o.start(t0); o.stop(t0 + dur + .02);
   };
   return {
     unlock: ensure,
@@ -429,11 +555,14 @@ const buzz = ms => { try { navigator.vibrate && navigator.vibrate(ms); } catch {
 
 /* ---------- shell ---------- */
 const app = $('#app');
-const setTitle = t => { $('#barTitle').textContent = t || ''; };
+const langBtn = $('#langBtn');
+const soundBtn = $('#soundBtn');
+const setTitle = s => { $('#barTitle').textContent = s || ''; };
 
 function go(render, ...args) {
   if (S.cleanup) { S.cleanup(); S.cleanup = null; }
   S.inPlay = false;
+  langBtn.hidden = render !== home;
   app.innerHTML = '';
   window.scrollTo(0, 0);
   render(...args);
@@ -456,27 +585,37 @@ function ask(msg, yes, no) {
   });
 }
 
+const paintSound = () => {
+  soundBtn.setAttribute('aria-pressed', String(S.sound));
+  soundBtn.setAttribute('aria-label', S.sound ? t('soundOn') : t('soundOff'));
+  $('.wave', soundBtn).style.display = S.sound ? '' : 'none';
+};
+function applyLang() {
+  const root = document.documentElement;
+  root.lang = S.lang;
+  root.dir = S.lang === 'ar' ? 'rtl' : 'ltr';
+  document.title = t('appName');
+  langBtn.textContent = S.lang === 'ar' ? 'EN' : 'ع';
+  langBtn.setAttribute('aria-label', t('switchLang'));
+  $('#homeBtn').setAttribute('aria-label', t('homeBtn'));
+  paintSound();
+}
+
 $('#homeBtn').addEventListener('click', async () => {
   if (S.cup || S.inPlay) {
-    const leave = await ask(S.cup ? 'Leave this cup? The scores so far will be lost.' : 'Stop this game?', 'Leave', 'Keep playing');
+    const leave = await ask(S.cup ? t('leaveCup') : t('stopGame'), t('leave'), t('keepPlaying'));
     if (!leave) return;
     S.cup = null;
   }
   go(home);
 });
-const soundBtn = $('#soundBtn');
-const paintSound = () => {
-  soundBtn.setAttribute('aria-pressed', String(S.sound));
-  soundBtn.setAttribute('aria-label', S.sound ? 'Sound on' : 'Sound off');
-  $('.wave', soundBtn).style.display = S.sound ? '' : 'none';
-};
 soundBtn.addEventListener('click', () => { S.sound = !S.sound; store.set('sound', S.sound); paintSound(); Sound.tap(); });
-paintSound();
+langBtn.addEventListener('click', () => { S.lang = S.lang === 'ar' ? 'en' : 'ar'; store.set('lang', S.lang); applyLang(); Sound.tap(); go(home); });
 document.addEventListener('pointerdown', () => Sound.unlock(), { once: true });
 
 const avatarHtml = (p, cls = '') => `<span class="avatar ${cls}" data-tier="${p.tier}" aria-hidden="true">${p.avatar}</span>`;
-const tierTag = t => `<span class="tier-tag" data-tier="${t}">${TIERS[t].name}</span>`;
-const gameTile = (id, extra = '') => `<span class="gicon">${GAMES[id].icon}</span><span><b>${GAMES[id].name}</b><span>${GAMES[id].how}</span></span>${extra}`;
+const tierTag = id => `<span class="tier-tag" data-tier="${id}">${tier(id).name}</span>`;
+const gameTile = id => { const g = game(id); return `<span class="gicon">${g.icon}</span><span><b>${g.name}</b><span>${g.how}</span></span>`; };
 
 /* ---------- install hints ---------- */
 let installEvt = null;
@@ -503,39 +642,39 @@ function home() {
     <section class="hero">
       ${TROPHY}
       <div>
-        <h1>Family Brain Cup</h1>
-        <p>Five quick brain games. Everyone plays at their own level, so the youngest can beat the grown-ups.</p>
+        <h1>${t('appName')}</h1>
+        <p>${t('tagline')}</p>
       </div>
     </section>
 
     <section class="section">
-      <div class="section-head"><h2 style="font-size:26px">Players</h2><span class="muted">${ps.length ? ps.length + (ps.length === 1 ? ' player' : ' players') : 'Add everyone who will play'}</span></div>
+      <div class="section-head"><h2 style="font-size:26px">${t('players')}</h2><span class="muted">${ps.length ? t('playerCount', ps.length) : t('addEveryone')}</span></div>
       <div class="players">
         ${ps.map(p => `<button class="pcard" data-edit="${p.id}" data-tier="${p.tier}">${avatarHtml(p)}<span class="who"><span class="name" dir="auto">${esc(p.name)}</span>${tierTag(p.tier)}</span></button>`).join('')}
-        <button class="pcard add-card" id="addPlayer">+ Add player</button>
+        <button class="pcard add-card" id="addPlayer">${t('addPlayerCard')}</button>
       </div>
     </section>
 
     <div class="section">
-      <button class="btn primary big wide" id="startCup" ${ps.length ? '' : 'disabled'}>Start a family cup</button>
+      <button class="btn primary big wide" id="startCup" ${ps.length ? '' : 'disabled'}>${t('startCup')}</button>
       <div class="row">
-        <button class="btn" id="practice" ${ps.length ? '' : 'disabled'}>Practice</button>
-        <button class="btn" id="fame">Hall of fame</button>
+        <button class="btn" id="practice" ${ps.length ? '' : 'disabled'}>${t('practice')}</button>
+        <button class="btn" id="fame">${t('fame')}</button>
       </div>
-      <button class="btn ghost" id="installBtn" ${installEvt ? '' : 'hidden'}>Install on this device</button>
-      ${showIOSTip ? `<div class="install-tip">Play it like an app: tap <b>Share</b> then <b>Add to Home Screen</b>. It works offline after that.</div>` : ''}
+      <button class="btn ghost" id="installBtn" ${installEvt ? '' : 'hidden'}>${t('install')}</button>
+      ${showIOSTip ? `<div class="install-tip">${t('iosTip')}</div>` : ''}
     </div>
 
     <section class="section">
-      <span class="eyebrow">Three levels</span>
+      <span class="eyebrow">${t('threeLevels')}</span>
       <div class="levels">
-        ${Object.entries(TIERS).map(([id, t]) => `<div class="level" data-tier="${id}"><h3>${t.name}</h3><span class="ages">${t.ages}</span><p>${t.blurb}</p></div>`).join('')}
+        ${TIER_IDS.map(id => { const v = tier(id); return `<div class="level" data-tier="${id}"><h3>${v.name}</h3><span class="ages">${v.ages}</span><p>${v.blurb}</p></div>`; }).join('')}
       </div>
     </section>
 
     <section class="section">
-      <span class="eyebrow">Five games</span>
-      <div class="games">${Object.keys(GAMES).map(id => `<div class="gtile" data-game="${id}">${gameTile(id)}</div>`).join('')}</div>
+      <span class="eyebrow">${t('fiveGames')}</span>
+      <div class="games">${GAME_IDS.map(id => `<div class="gtile" data-game="${id}">${gameTile(id)}</div>`).join('')}</div>
     </section>`;
 
   $('#addPlayer').onclick = () => go(playerForm);
@@ -552,23 +691,23 @@ function playerForm(id) {
   const used = new Set(S.players.map(p => p.avatar));
   const draft = existing ? { ...existing } : { id: uid(), name: '', age: '', tier: 'explorer', avatar: AVATARS.find(a => !used.has(a)) || AVATARS[0], stats: { cups: 0, played: 0, best: {} } };
   let tierTouched = !!existing;
-  setTitle(existing ? 'Edit player' : 'New player');
+  setTitle(existing ? t('editPlayer') : t('newPlayer'));
 
   app.innerHTML = `
     <form class="section" id="pf" autocomplete="off">
       <div class="form-grid">
-        <div class="field"><label for="pname">Name</label><input class="input" id="pname" maxlength="14" dir="auto" placeholder="e.g. Sara" value="${esc(draft.name)}" required></div>
-        <div class="field"><label for="page">Age</label><input class="input" id="page" type="number" inputmode="numeric" min="3" max="120" placeholder="11" value="${esc(draft.age)}"></div>
+        <div class="field"><label for="pname">${t('name')}</label><input class="input" id="pname" maxlength="14" dir="auto" placeholder="${esc(t('namePh'))}" value="${esc(draft.name)}" required></div>
+        <div class="field"><label for="page">${t('age')}</label><input class="input" id="page" type="number" inputmode="numeric" min="3" max="120" placeholder="11" value="${esc(draft.age)}"></div>
       </div>
-      <div class="field"><label>Level</label>
-        <div class="seg" id="tierSeg">${Object.entries(TIERS).map(([t, v]) => `<button type="button" data-tier="${t}" aria-pressed="${t === draft.tier}"><b>${v.name}</b><small>${v.ages}</small></button>`).join('')}</div>
+      <div class="field"><label>${t('level')}</label>
+        <div class="seg" id="tierSeg">${TIER_IDS.map(tid => `<button type="button" data-tier="${tid}" aria-pressed="${tid === draft.tier}"><b>${tier(tid).name}</b><small>${tier(tid).ages}</small></button>`).join('')}</div>
       </div>
-      <div class="field"><label>Pick an animal</label>
+      <div class="field"><label>${t('pickAnimal')}</label>
         <div class="avatars" id="avs">${AVATARS.map(a => `<button type="button" aria-pressed="${a === draft.avatar}" aria-label="${a}">${a}</button>`).join('')}</div>
       </div>
       <div class="row">
-        ${existing ? '<button type="button" class="btn ghost" id="del">Remove</button>' : ''}
-        <button type="submit" class="btn primary">${existing ? 'Save' : 'Add player'}</button>
+        ${existing ? `<button type="button" class="btn ghost" id="del">${t('remove')}</button>` : ''}
+        <button type="submit" class="btn primary">${existing ? t('save') : t('addPlayer')}</button>
       </div>
     </form>`;
 
@@ -580,7 +719,7 @@ function playerForm(id) {
   $$('#tierSeg button').forEach(b => b.onclick = () => { draft.tier = b.dataset.tier; tierTouched = true; paintTier(); Sound.tap(); });
   $$('#avs button').forEach(b => b.onclick = () => { draft.avatar = b.textContent; $$('#avs button').forEach(x => x.setAttribute('aria-pressed', String(x === b))); Sound.tap(); });
   if (existing) $('#del').onclick = async () => {
-    if (await ask(`Remove ${existing.name} and their trophies?`, 'Remove', 'Cancel')) {
+    if (await ask(t('removeQ', existing.name), t('remove'), t('cancel'))) {
       S.players = S.players.filter(p => p.id !== existing.id); savePlayers(); go(home);
     }
   };
@@ -598,21 +737,21 @@ function playerForm(id) {
 
 /* ================= CUP ================= */
 function cupSetup() {
-  setTitle('New cup');
+  setTitle(t('newCup'));
   const chosen = new Set(S.players.map(p => p.id));
-  const games = new Set(Object.keys(GAMES));
+  const games = new Set(GAME_IDS);
   let rounds = 5;
   app.innerHTML = `
-    <section class="section"><span class="eyebrow">Who is playing?</span>
+    <section class="section"><span class="eyebrow">${t('whoPlaying')}</span>
       <div class="pick-players" id="pp">${S.players.map(p => `<button data-id="${p.id}" data-tier="${p.tier}" aria-pressed="true">${avatarHtml(p)}<span dir="auto">${esc(p.name)}</span></button>`).join('')}</div>
     </section>
-    <section class="section"><span class="eyebrow">Rounds</span>
-      <div class="seg numbers" id="rs">${[3, 5, 7].map(n => `<button data-n="${n}" aria-pressed="${n === rounds}"><b>${n}</b><small>${n === 3 ? 'about 5 min' : n === 5 ? 'about 10 min' : 'about 15 min'}</small></button>`).join('')}</div>
+    <section class="section"><span class="eyebrow">${t('rounds')}</span>
+      <div class="seg numbers" id="rs">${[3, 5, 7].map((n, i) => `<button data-n="${n}" aria-pressed="${n === rounds}"><b>${n}</b><small>${t('roundTime')[i]}</small></button>`).join('')}</div>
     </section>
-    <section class="section"><span class="eyebrow">Games in this cup</span>
-      <div class="games" id="gs">${Object.keys(GAMES).map(id => `<button class="gtile selectable" data-game="${id}" aria-pressed="true">${gameTile(id)}</button>`).join('')}</div>
+    <section class="section"><span class="eyebrow">${t('gamesInCup')}</span>
+      <div class="games" id="gs">${GAME_IDS.map(id => `<button class="gtile selectable" data-game="${id}" aria-pressed="true">${gameTile(id)}</button>`).join('')}</div>
     </section>
-    <button class="btn primary big wide" id="go">Start the cup</button>`;
+    <button class="btn primary big wide" id="go">${t('startTheCup')}</button>`;
 
   const refresh = () => { $('#go').disabled = !chosen.size || !games.size; };
   $$('#pp button').forEach(b => b.onclick = () => { const id = b.dataset.id; chosen.has(id) ? chosen.delete(id) : chosen.add(id); b.setAttribute('aria-pressed', String(chosen.has(id))); Sound.tap(); refresh(); });
@@ -630,28 +769,28 @@ function cupSetup() {
 const turnOrder = () => { const c = S.cup, n = c.ids.length, k = c.round % n; return [...c.ids.slice(k), ...c.ids.slice(0, k)]; };
 
 function roundIntro() {
-  const c = S.cup, gid = c.order[c.round];
-  setTitle(`Round ${c.round + 1} of ${c.order.length}`);
+  const c = S.cup, gid = c.order[c.round], g = game(gid);
+  setTitle(t('roundOf', c.round + 1, c.order.length));
   c.turn = 0; c.roundPts = {};
   app.innerHTML = `<div class="center" data-game="${gid}">
-    <span class="eyebrow">Round ${c.round + 1}</span>
-    <div class="big-icon">${GAMES[gid].icon}</div>
-    <h2>${GAMES[gid].name}</h2>
-    <p>${GAMES[gid].how} Each player gets puzzles for their own level.</p>
+    <span class="eyebrow">${t('round', c.round + 1)}</span>
+    <div class="big-icon">${g.icon}</div>
+    <h2>${g.name}</h2>
+    <p>${g.how} ${t('ownLevel')}</p>
     <div class="lineup">${turnOrder().map(id => { const p = byId(id); return `<span class="pill">${avatarHtml(p)}<span dir="auto">${esc(p.name)}</span></span>`; }).join('')}</div>
-    <button class="btn primary big" id="go">Let's go</button></div>`;
+    <button class="btn primary big" id="go">${t('letsGo')}</button></div>`;
   $('#go').onclick = () => go(handoff);
 }
 
 function handoff() {
   const c = S.cup, p = byId(turnOrder()[c.turn]);
-  setTitle(`Round ${c.round + 1} of ${c.order.length}`);
+  setTitle(t('roundOf', c.round + 1, c.order.length));
   app.innerHTML = `<div class="center">
-    ${S.cup.ids.length > 1 ? '<span class="eyebrow">Pass the device to</span>' : '<span class="eyebrow">Your turn</span>'}
+    <span class="eyebrow">${c.ids.length > 1 ? t('passTo') : t('yourTurn')}</span>
     ${avatarHtml(p, 'xl')}
     <h2 dir="auto">${esc(p.name)}</h2>
     ${tierTag(p.tier)}
-    <button class="btn primary big" id="go">I'm ready</button></div>`;
+    <button class="btn primary big" id="go">${t('ready')}</button></div>`;
   $('#go').onclick = () => go(playGame, c.order[c.round], p, (score, detail) => {
     c.scores[p.id] += score;
     c.roundPts[p.id] = score;
@@ -663,11 +802,11 @@ function turnResult(p, score, detail) {
   const c = S.cup, order = turnOrder();
   const nextP = c.turn + 1 < order.length ? byId(order[c.turn + 1]) : null;
   app.innerHTML = `<div class="center">
-    <span class="eyebrow" dir="auto">${esc(p.name)} scored</span>
-    <div class="points">+${score}</div>
+    <span class="eyebrow" dir="auto">${esc(t('scored', p.name))}</span>
+    <div class="points" dir="ltr">+${score}</div>
     <ul class="detail">${detail.map(d => `<li>${esc(d)}</li>`).join('')}</ul>
-    <p>Cup total: <b style="color:var(--ink)">${c.scores[p.id]}</b></p>
-    <button class="btn primary big" id="go">${nextP ? `Next: ${esc(nextP.name)}` : 'See the scores'}</button></div>`;
+    <p>${t('cupTotal')} <b style="color:var(--ink)">${c.scores[p.id]}</b></p>
+    <button class="btn primary big" id="go">${nextP ? esc(t('nextP', nextP.name)) : t('seeScores')}</button></div>`;
   $('#go').onclick = () => {
     if (nextP) { c.turn++; go(handoff); }
     else go(roundScores);
@@ -679,14 +818,14 @@ const ranked = () => S.cup.ids.map(byId).sort((a, b) => S.cup.scores[b.id] - S.c
 function roundScores() {
   const c = S.cup, last = c.round + 1 >= c.order.length;
   const list = ranked(), top = Math.max(1, ...list.map(p => c.scores[p.id]));
-  setTitle(`After round ${c.round + 1} of ${c.order.length}`);
+  setTitle(t('afterRound', c.round + 1, c.order.length));
   app.innerHTML = `<div class="center">
-    <h2>Scoreboard</h2>
+    <h2>${t('scoreboard')}</h2>
     <div class="standings">${list.map((p, i) => `<div class="stand" data-tier="${p.tier}">
       <span class="rank">${i + 1}</span>${avatarHtml(p)}
       <span class="bar-wrap"><span class="nm" dir="auto">${esc(p.name)}</span><span class="track"><i style="width:${(c.scores[p.id] / top) * 100}%"></i></span></span>
-      <span class="sc">${c.scores[p.id]}<small>+${c.roundPts[p.id] || 0}</small></span></div>`).join('')}</div>
-    <button class="btn primary big" id="go">${last ? 'Crown the winner' : `Round ${c.round + 2}: ${GAMES[c.order[c.round + 1]].name}`}</button></div>`;
+      <span class="sc">${c.scores[p.id]}<small dir="ltr">+${c.roundPts[p.id] || 0}</small></span></div>`).join('')}</div>
+    <button class="btn primary big" id="go">${last ? t('crown') : t('nextRound', c.round + 2, game(c.order[c.round + 1]).name)}</button></div>`;
   $('#go').onclick = () => {
     if (last) go(finale);
     else { c.round++; go(roundIntro); }
@@ -701,19 +840,19 @@ function finale() {
   list.forEach(p => { p.stats.played++; });
   winners.forEach(p => { p.stats.cups++; });
   savePlayers();
-  setTitle('Cup finished');
+  setTitle(t('cupFinished'));
   const podium = [list[1], list[0], list[2]].map((p, i) => p ? `<div class="step p${[2, 1, 3][i]}" data-tier="${p.tier}">
       ${avatarHtml(p)}<span class="nm" dir="auto">${esc(p.name)}</span><span class="sc">${c.scores[p.id]}</span>
       <span class="block">${rankOf(p)}</span></div>` : '').join('');
-  const names = winners.map(p => esc(p.name)).join(' & ');
+  const names = winners.map(p => esc(p.name)).join(t('and'));
   app.innerHTML = `<div class="center">
-    <span class="eyebrow">${winners.length > 1 ? 'A shared victory' : 'The cup goes to'}</span>
+    <span class="eyebrow">${winners.length > 1 ? t('shared') : t('goesTo')}</span>
     <h2 dir="auto" style="color:var(--sun)">${names}</h2>
     <div class="podium">${podium}</div>
     ${list.length > 3 ? `<p>${list.slice(3).map(p => `${esc(p.name)} ${c.scores[p.id]}`).join(' · ')}</p>` : ''}
     <div class="row" style="width:100%;max-width:520px">
-      <button class="btn" id="home2">Home</button>
-      <button class="btn primary" id="again">Play again</button>
+      <button class="btn" id="home2">${t('home')}</button>
+      <button class="btn primary" id="again">${t('playAgain')}</button>
     </div></div>`;
   S.cup = null;
   Sound.win(); confetti();
@@ -723,14 +862,14 @@ function finale() {
 
 /* ================= PRACTICE ================= */
 function practiceSetup(preId) {
-  setTitle('Practice');
+  setTitle(t('practice'));
   let who = preId || S.players[0].id;
   app.innerHTML = `
-    <section class="section"><span class="eyebrow">Who is practising?</span>
+    <section class="section"><span class="eyebrow">${t('whoPractising')}</span>
       <div class="pick-players" id="pp">${S.players.map(p => `<button data-id="${p.id}" data-tier="${p.tier}" aria-pressed="${p.id === who}">${avatarHtml(p)}<span dir="auto">${esc(p.name)}</span></button>`).join('')}</div>
     </section>
-    <section class="section"><span class="eyebrow">Pick a game</span>
-      <div class="games">${Object.keys(GAMES).map(id => `<button class="gtile" data-game="${id}">${gameTile(id)}</button>`).join('')}</div>
+    <section class="section"><span class="eyebrow">${t('pickGame')}</span>
+      <div class="games">${GAME_IDS.map(id => `<button class="gtile" data-game="${id}">${gameTile(id)}</button>`).join('')}</div>
     </section>`;
   $$('#pp button').forEach(b => b.onclick = () => { who = b.dataset.id; $$('#pp button').forEach(x => x.setAttribute('aria-pressed', String(x === b))); Sound.tap(); });
   $$('.games button').forEach(b => b.onclick = () => practiceRun(b.dataset.game, who));
@@ -738,17 +877,17 @@ function practiceSetup(preId) {
 
 function practiceRun(gid, who) {
   const p = byId(who);
+  const prev = p.stats.best[gid] || 0;
   go(playGame, gid, p, (score, detail) => go(() => {
-    setTitle('Practice');
-    const prev = p.stats.best[gid] || 0;
+    setTitle(t('practice'));
     app.innerHTML = `<div class="center">
-      <span class="eyebrow">${GAMES[gid].name}</span>
+      <span class="eyebrow">${game(gid).name}</span>
       <div class="points">${score}</div>
       <ul class="detail">${detail.map(d => `<li>${esc(d)}</li>`).join('')}</ul>
-      <p>${score > prev ? (prev ? `New personal best! Old best was ${prev}.` : 'First score on the board!') : `Personal best: ${prev}`}</p>
+      <p>${score > prev ? (prev ? t('newBest', prev) : t('firstScore')) : t('bestWas', prev)}</p>
       <div class="row" style="width:100%;max-width:520px">
-        <button class="btn" id="other">Other games</button>
-        <button class="btn primary" id="again">Play again</button>
+        <button class="btn" id="other">${t('otherGames')}</button>
+        <button class="btn primary" id="again">${t('playAgain')}</button>
       </div></div>`;
     if (score > prev) { Sound.win(); confetti(); }
     $('#other').onclick = () => go(practiceSetup, who);
@@ -758,18 +897,17 @@ function practiceRun(gid, who) {
 
 /* ================= HALL OF FAME ================= */
 function hallOfFame() {
-  setTitle('Hall of fame');
+  setTitle(t('fame'));
   const list = [...S.players].sort((a, b) => b.stats.cups - a.stats.cups || b.stats.played - a.stats.played);
-  const ids = Object.keys(GAMES);
   app.innerHTML = `<section class="section">
-    <h2 style="font-size:34px">Hall of fame</h2>
+    <h2 style="font-size:34px">${t('fame')}</h2>
     ${list.length ? `<div class="table-wrap"><table class="fame">
-      <thead><tr><th>Player</th><th title="Cups won">Cups</th><th>Played</th>${ids.map(id => `<th title="Best ${GAMES[id].name}">${GAMES[id].icon}</th>`).join('')}</tr></thead>
+      <thead><tr><th>${t('thPlayer')}</th><th>${t('thCups')}</th><th>${t('thPlayed')}</th>${GAME_IDS.map(id => `<th title="${esc(t('thBest', game(id).name))}">${GAME_ICONS[id]}</th>`).join('')}</tr></thead>
       <tbody>${list.map(p => `<tr><td><span class="who" data-tier="${p.tier}">${avatarHtml(p)}<span dir="auto">${esc(p.name)}</span></span></td>
         <td style="color:var(--sun);font-family:var(--f-display);font-size:22px">${p.stats.cups}</td><td>${p.stats.played}</td>
-        ${ids.map(id => `<td>${p.stats.best[id] ?? '–'}</td>`).join('')}</tr>`).join('')}</tbody></table></div>
-      <p class="muted" style="margin:0">Game columns show each player's best score, out of about 100.</p>`
-    : '<p class="muted">No players yet. Add your family on the home screen.</p>'}
+        ${GAME_IDS.map(id => `<td>${p.stats.best[id] ?? '–'}</td>`).join('')}</tr>`).join('')}</tbody></table></div>
+      <p class="muted" style="margin:0">${t('fameNote')}</p>`
+    : `<p class="muted">${t('noPlayers')}</p>`}
   </section>`;
 }
 
@@ -794,7 +932,7 @@ function makeTimer(fill) {
 
 function playGame(gid, player, done) {
   S.inPlay = true;
-  setTitle(GAMES[gid].name);
+  setTitle(game(gid).name);
   app.innerHTML = `<div class="play">
     <div class="play-head">${avatarHtml(player)}<div class="who"><div class="name" dir="auto">${esc(player.name)}</div>${tierTag(player.tier)}</div><div class="live" id="live">0</div></div>
     <div class="timer"><i id="tfill"></i></div>
@@ -830,9 +968,9 @@ function playGame(gid, player, done) {
 function quiz(ctx, make, time, count = 5) {
   let i = 0, right = 0;
   const next = () => {
-    if (i >= count) return ctx.done([`${right} of ${count} correct`]);
+    if (i >= count) return ctx.done([t('correct', right, count)]);
     const q = make(ctx.tier); i++;
-    ctx.stage.innerHTML = `<div class="q-count">Question ${i} of ${count}</div>${q.prompt}
+    ctx.stage.innerHTML = `<div class="q-count">${t('question', i, count)}</div>${q.prompt}
       <div class="choices">${q.choices.map((c, k) => `<button class="choice" data-k="${k}">${c}</button>`).join('')}</div>`;
     const btns = $$('.choice', ctx.stage);
     let locked = false;
@@ -869,30 +1007,34 @@ const THINGS = ['🍎', '🍓', '🐞', '⭐', '🎈', '🐟', '🌼', '🍪', '
 /* ---------- Number Sprint ---------- */
 const MATH = {
   star: [
-    () => { const n = rand(3, 9), e = pick(THINGS); return { prompt: `<div class="q-label">How many?</div><div class="count-row">${`<span>${e}</span>`.repeat(n)}</div>`, ...numChoices(n, [1, 2], [], 1) }; },
+    () => { const n = rand(3, 9), e = pick(THINGS); return { prompt: `<div class="q-label">${t('howMany')}</div><div class="count-row">${`<span>${e}</span>`.repeat(n)}</div>`, ...numChoices(n, [1, 2], [], 1) }; },
     () => { const a = rand(1, 6), b = rand(1, 10 - a), e = pick(THINGS); return { prompt: `<div class="q-big">${a} + ${b}</div><div class="q-help">${e.repeat(a)} + ${e.repeat(b)}</div>`, ...numChoices(a + b, [1, 2], [], 0) }; },
     () => { const a = rand(3, 10), b = rand(1, a - 1), e = pick(THINGS); return { prompt: `<div class="q-big">${a} − ${b}</div><div class="q-help">${e.repeat(a - b)}<s>${e.repeat(b)}</s></div>`, ...numChoices(a - b, [1, 2], [], 0) }; },
-    () => { const s = new Set(); while (s.size < 4) s.add(rand(1, 20)); const arr = shuffle([...s]); return { prompt: `<div class="q-label">Which number is the biggest?</div>`, choices: arr.map(String), answer: String(Math.max(...arr)) }; },
+    () => { const s = new Set(); while (s.size < 4) s.add(rand(1, 20)); const arr = shuffle([...s]); return { prompt: `<div class="q-label">${t('biggest')}</div>`, choices: arr.map(String), answer: String(Math.max(...arr)) }; },
   ],
   explorer: [
     () => { const a = rand(3, 12), b = rand(3, 12); return { prompt: `<div class="q-big">${a} × ${b}</div>`, ...numChoices(a * b, [a, b, 1, 2]) }; },
     () => { const b = rand(2, 12), q = rand(2, 12); return { prompt: `<div class="q-big">${b * q} ÷ ${b}</div>`, ...numChoices(q, [1, 2, 3], [], 1) }; },
     () => { const a = rand(25, 99), b = rand(12, 99); return { prompt: `<div class="q-big">${a} + ${b}</div>`, ...numChoices(a + b, [1, 10, 9, 11]) }; },
     () => { const a = rand(60, 160), b = rand(12, a - 20); return { prompt: `<div class="q-big">${a} − ${b}</div>`, ...numChoices(a - b, [1, 10, 9, 11]) }; },
-    () => { const a = rand(3, 9), b = rand(3, 12); return { prompt: `<div class="q-big">${a} × ? = ${a * b}</div>`, ...numChoices(b, [1, 2, 3], [], 1) }; },
+    () => { const a = rand(3, 9), b = rand(3, 12); return { prompt: `<div class="q-big">${a} × ${t('ask')} = ${a * b}</div>`, ...numChoices(b, [1, 2, 3], [], 1) }; },
   ],
   master: [
     () => { const a = rand(12, 29), b = rand(12, 19); return { prompt: `<div class="q-big">${a} × ${b}</div>`, ...numChoices(a * b, [10, 20, a, b, 2]) }; },
-    () => { const p = pick([15, 20, 25, 30, 40, 60, 75]), n = rand(2, 12) * 20; return { prompt: `<div class="q-big">${p}% of ${n}</div>`, ...numChoices(p * n / 100, [5, 10, 15, 2]) }; },
+    () => { const p = pick([15, 20, 25, 30, 40, 60, 75]), n = rand(2, 12) * 20; return { prompt: `<div class="q-big">${t('pctOf', p, n)}</div>`, ...numChoices(p * n / 100, [5, 10, 15, 2]) }; },
     () => { const n = rand(11, 25); return { prompt: `<div class="q-big">${n}²</div>`, ...numChoices(n * n, [n, 2 * n, 10, 1], [n * 2]) }; },
     () => { const a = rand(2, 20), b = rand(2, 9), c = rand(2, 9); return { prompt: `<div class="q-big">${a} + ${b} × ${c}</div>`, ...numChoices(a + b * c, [b, c, 10, 1], [(a + b) * c]) }; },
-    () => { const d = pick([3, 4, 5, 6, 8]), m = rand(1, d - 1), t = d * rand(3, 12); return { prompt: `<div class="q-big">${m}/${d} of ${t}</div>`, ...numChoices(m * t / d, [t / d, 1, 2, 5], [], 1) }; },
+    () => { const d = pick([3, 4, 5, 6, 8]), m = rand(1, d - 1), x = d * rand(3, 12); return { prompt: `<div class="q-big">${t('fracOf', m, d, x)}</div>`, ...numChoices(m * x / d, [x / d, 1, 2, 5], [], 1) }; },
   ],
 };
 
 /* ---------- What Comes Next? ---------- */
-const seqHtml = items => `<div class="q-label">What comes next?</div><div class="seq">${items.map(x => `<span>${x}</span>`).join('')}<span class="ask">?</span></div>`;
+const seqHtml = items => `<div class="q-label">${t('whatNext')}</div><div class="seq">${items.map(x => `<span>${x}</span>`).join('')}<span class="ask">${t('ask')}</span></div>`;
 const PATTERN_EMOJI = ['🔴', '🔵', '🟡', '🟢', '🟣', '🟠', '⭐', '🌙', '🍎', '🐟', '🐸', '🎈'];
+const ALPHABET = {
+  en: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split(''),
+  ar: 'أ ب ت ث ج ح خ د ذ ر ز س ش ص ض ط ظ ع غ ف ق ك ل م ن ه و ي'.split(' '),
+};
 const seqNum = (items, ans, spread, extra = [], min = 0) => ({ prompt: seqHtml(items), ...numChoices(ans, spread, extra, min) });
 const PATTERN = {
   star: [
@@ -917,14 +1059,16 @@ const PATTERN = {
     () => { const s = rand(5, 20), a = rand(4, 9), b = rand(1, 3); const xs = [s]; for (let i = 0; i < 5; i++) xs.push(xs[i] + (i % 2 ? -b : a)); const ans = xs.pop(); return seqNum(xs, ans, [1, a, b, a - b]); },
   ],
   master: [
-    () => { let a = rand(1, 5), b = rand(a, a + 4); const xs = [a, b]; while (xs.length < 6) xs.push(xs[xs.length - 1] + xs[xs.length - 2]); const ans = xs.pop(); return seqNum(xs, ans, [1, 2, xs[3], 5]); },
-    () => { const s = rand(1, 10), d = rand(1, 4); const xs = [s]; for (let i = 0; i < 4; i++) xs.push(xs[i] + d + i); const ans = xs.pop(); return seqNum(xs, ans, [1, 2, 3], [xs[4 - 1] + (xs[3] - xs[2])]); },
+    () => { const a = rand(1, 5), b = rand(a, a + 4); const xs = [a, b]; while (xs.length < 6) xs.push(xs[xs.length - 1] + xs[xs.length - 2]); const ans = xs.pop(); return seqNum(xs, ans, [1, 2, xs[3], 5]); },
+    () => { const s = rand(1, 10), d = rand(1, 4); const xs = [s]; for (let i = 0; i < 4; i++) xs.push(xs[i] + d + i); const ans = xs.pop(); return seqNum(xs, ans, [1, 2, 3], [xs[3] + (xs[3] - xs[2])]); },
     () => { const P = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47]; const k = rand(1, 8); const xs = P.slice(k, k + 5); return seqNum(xs, P[k + 5], [1, 2, 3, 4], [], 1); },
     () => { const s = rand(1, 4); const xs = [s]; for (let i = 0; i < 5; i++) xs.push(xs[i] * 2 + 1); const ans = xs.pop(); return seqNum(xs, ans, [1, 2, 3], [xs[4] * 2], 1); },
     () => { const n = rand(1, 3); const xs = [0, 1, 2, 3].map(i => (n + i) ** 3); return seqNum(xs, (n + 4) ** 3, [1, 10, 25], [(n + 4) ** 2 * 2], 1); },
     () => {
-      const s = rand(0, 5), A = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'; const idx = [s]; for (let i = 0; i < 4; i++) idx.push(idx[i] + i + 1);
-      const ans = idx.pop(); const set = new Set([ans]); while (set.size < 4) { const v = ans + pick([-2, -1, 1, 2, 3]); if (v >= 0 && v < 26) set.add(v); }
+      const A = ALPHABET[S.lang], s = rand(0, 5), idx = [s];
+      for (let i = 0; i < 4; i++) idx.push(idx[i] + i + 1);
+      const ans = idx.pop(), set = new Set([ans]);
+      while (set.size < 4) { const v = ans + pick([-2, -1, 1, 2, 3]); if (v >= 0 && v < A.length) set.add(v); }
       return { prompt: seqHtml(idx.map(i => A[i])), choices: shuffle([...set]).map(i => A[i]), answer: A[ans] };
     },
   ],
@@ -932,38 +1076,49 @@ const PATTERN = {
 
 /* ---------- Word Builder ---------- */
 const WORDS = {
-  star: [['CAT', '🐱'], ['DOG', '🐶'], ['SUN', '☀️'], ['BUS', '🚌'], ['PIG', '🐷'], ['HAT', '🎩'], ['BEE', '🐝'], ['FOX', '🦊'], ['COW', '🐮'], ['EGG', '🥚'], ['KEY', '🔑'], ['CAR', '🚗'], ['OWL', '🦉'], ['ANT', '🐜'], ['FISH', '🐟'], ['FROG', '🐸'], ['DUCK', '🦆'], ['CAKE', '🎂'], ['STAR', '⭐'], ['MOON', '🌙'], ['BALL', '⚽'], ['TREE', '🌳'], ['BOOK', '📖'], ['BEAR', '🐻'], ['LION', '🦁'], ['SHIP', '🚢']],
-  explorer: [['PLANET', 'We live on one called Earth'], ['ROCKET', 'It blasts off into space'], ['CASTLE', 'A king and queen live here'], ['PIRATE', 'Sails the seas hunting for treasure'], ['GUITAR', 'An instrument with six strings'], ['JUNGLE', 'A thick, wild forest full of animals'], ['DRAGON', 'A legendary beast that breathes fire'], ['TURTLE', 'Carries its house on its back'], ['PENCIL', 'You write with it and can rub it out'], ['ISLAND', 'Land with water all around it'], ['WIZARD', 'Casts spells with a wand'], ['SPIDER', 'Has eight legs and spins webs'], ['DOLPHIN', 'A clever sea mammal that clicks and whistles'], ['PYRAMID', 'Ancient Egyptian tomb with a pointed top'], ['GALAXY', 'A huge family of stars, like the Milky Way'], ['PUZZLE', 'Pieces that fit together'], ['CAMERA', 'Takes photos'], ['MONKEY', 'Swings through trees and loves bananas'], ['VOLCANO', 'A mountain that can erupt with lava'], ['DESERT', 'A hot, dry, sandy place'], ['CAMEL', 'Crosses the desert with a hump on its back'], ['FALCON', 'A fast hunting bird']],
-  master: [['TELESCOPE', 'Instrument for viewing distant stars'], ['LABYRINTH', 'A maze, home of the Minotaur in Greek myth'], ['ORCHESTRA', 'Large group of musicians led by a conductor'], ['CROCODILE', 'River reptile with one of the strongest bites'], ['ALGORITHM', 'Step-by-step rules a computer follows'], ['HURRICANE', 'Powerful tropical storm with violent winds'], ['ARCHITECT', 'Person who designs buildings'], ['CHAMELEON', 'Lizard that changes colour'], ['PARACHUTE', 'Slows your fall from an aircraft'], ['MARATHON', 'A 42.195 km foot race'], ['ASTRONAUT', 'Trained to travel into space'], ['SATELLITE', 'Object that orbits a planet'], ['DICTIONARY', 'Book of words and their meanings'], ['EQUATOR', 'Imaginary line around the middle of the Earth'], ['CHOCOLATE', 'Sweet treat made from cacao beans'], ['KANGAROO', 'Carries its baby in a pouch'], ['MICROSCOPE', 'Makes tiny things look big'], ['VOCABULARY', 'All the words a person knows']],
+  en: {
+    star: [['CAT', '🐱'], ['DOG', '🐶'], ['SUN', '☀️'], ['BUS', '🚌'], ['PIG', '🐷'], ['HAT', '🎩'], ['BEE', '🐝'], ['FOX', '🦊'], ['COW', '🐮'], ['EGG', '🥚'], ['KEY', '🔑'], ['CAR', '🚗'], ['OWL', '🦉'], ['ANT', '🐜'], ['FISH', '🐟'], ['FROG', '🐸'], ['DUCK', '🦆'], ['CAKE', '🎂'], ['STAR', '⭐'], ['MOON', '🌙'], ['BALL', '⚽'], ['TREE', '🌳'], ['BOOK', '📖'], ['BEAR', '🐻'], ['LION', '🦁'], ['SHIP', '🚢']],
+    explorer: [['PLANET', 'We live on one called Earth'], ['ROCKET', 'It blasts off into space'], ['CASTLE', 'A king and queen live here'], ['PIRATE', 'Sails the seas hunting for treasure'], ['GUITAR', 'An instrument with six strings'], ['JUNGLE', 'A thick, wild forest full of animals'], ['DRAGON', 'A legendary beast that breathes fire'], ['TURTLE', 'Carries its house on its back'], ['PENCIL', 'You write with it and can rub it out'], ['ISLAND', 'Land with water all around it'], ['WIZARD', 'Casts spells with a wand'], ['SPIDER', 'Has eight legs and spins webs'], ['DOLPHIN', 'A clever sea mammal that clicks and whistles'], ['PYRAMID', 'Ancient Egyptian tomb with a pointed top'], ['GALAXY', 'A huge family of stars, like the Milky Way'], ['PUZZLE', 'Pieces that fit together'], ['CAMERA', 'Takes photos'], ['MONKEY', 'Swings through trees and loves bananas'], ['VOLCANO', 'A mountain that can erupt with lava'], ['DESERT', 'A hot, dry, sandy place'], ['CAMEL', 'Crosses the desert with a hump on its back'], ['FALCON', 'A fast hunting bird']],
+    master: [['TELESCOPE', 'Instrument for viewing distant stars'], ['LABYRINTH', 'A maze, home of the Minotaur in Greek myth'], ['ORCHESTRA', 'Large group of musicians led by a conductor'], ['CROCODILE', 'River reptile with one of the strongest bites'], ['ALGORITHM', 'Step-by-step rules a computer follows'], ['HURRICANE', 'Powerful tropical storm with violent winds'], ['ARCHITECT', 'Person who designs buildings'], ['CHAMELEON', 'Lizard that changes colour'], ['PARACHUTE', 'Slows your fall from an aircraft'], ['MARATHON', 'A 42.195 km foot race'], ['ASTRONAUT', 'Trained to travel into space'], ['SATELLITE', 'Object that orbits a planet'], ['DICTIONARY', 'Book of words and their meanings'], ['EQUATOR', 'Imaginary line around the middle of the Earth'], ['CHOCOLATE', 'Sweet treat made from cacao beans'], ['KANGAROO', 'Carries its baby in a pouch'], ['MICROSCOPE', 'Makes tiny things look big'], ['VOCABULARY', 'All the words a person knows']],
+  },
+  ar: {
+    star: [['قطة', '🐱'], ['كلب', '🐶'], ['شمس', '☀️'], ['بيت', '🏠'], ['سمك', '🐟'], ['أسد', '🦁'], ['قمر', '🌙'], ['كرة', '⚽'], ['بطة', '🦆'], ['فيل', '🐘'], ['موز', '🍌'], ['جمل', '🐪'], ['باب', '🚪'], ['ثلج', '❄️'], ['قلب', '❤️'], ['عنب', '🍇'], ['بيض', '🥚'], ['نجمة', '⭐'], ['وردة', '🌹'], ['نحلة', '🐝'], ['شجرة', '🌳'], ['كتاب', '📖'], ['تفاح', '🍎'], ['خروف', '🐑']],
+    explorer: [['كوكب', 'نعيش على واحد منها اسمه الأرض'], ['صاروخ', 'ينطلق بسرعة كبيرة إلى الفضاء'], ['قلعة', 'بناء قديم محصّن يعيش فيه الملوك'], ['قرصان', 'يبحر في البحار بحثًا عن الكنز'], ['غيتار', 'آلة موسيقية لها ستة أوتار'], ['غابة', 'أشجار كثيفة مليئة بالحيوانات'], ['تنين', 'مخلوق أسطوري ينفث النار'], ['سلحفاة', 'تحمل بيتها على ظهرها'], ['مسطرة', 'أداة لرسم الخطوط المستقيمة'], ['جزيرة', 'أرض يحيط بها الماء من كل جانب'], ['ساحر', 'يلقي التعاويذ بعصا سحرية'], ['عنكبوت', 'له ثمانية أرجل وينسج الخيوط'], ['دلفين', 'حيوان بحري ذكي يصفّر ويلعب'], ['هرم', 'بناء مصري قديم رأسه مدبب'], ['مجرة', 'عائلة ضخمة من النجوم مثل درب التبانة'], ['كاميرا', 'تلتقط الصور'], ['قرد', 'يتسلق الأشجار ويحب الموز'], ['بركان', 'جبل يقذف الحمم'], ['صحراء', 'مكان حار وجاف مليء بالرمال'], ['صقر', 'طائر جارح سريع'], ['نخلة', 'شجرة تعطينا التمر'], ['فراشة', 'حشرة جميلة بأجنحة ملونة'], ['مظلة', 'تحمينا من المطر والشمس']],
+    master: [['تلسكوب', 'أداة لرؤية النجوم البعيدة'], ['أوركسترا', 'فرقة موسيقية كبيرة يقودها مايسترو'], ['تمساح', 'زاحف نهري من أقوى الحيوانات عضّة'], ['خوارزمية', 'خطوات منظمة يتبعها الحاسوب لحل مشكلة'], ['إعصار', 'عاصفة استوائية برياح عنيفة'], ['حرباء', 'سحلية تغيّر لونها'], ['ماراثون', 'سباق جري طوله 42.195 كم'], ['قاموس', 'كتاب يشرح معاني الكلمات'], ['شوكولاتة', 'حلوى تُصنع من حبوب الكاكاو'], ['كنغر', 'يحمل صغيره في جيب على بطنه'], ['مجهر', 'يجعل الأشياء الصغيرة تبدو كبيرة'], ['ديناصور', 'زاحف عملاق انقرض منذ ملايين السنين'], ['أخطبوط', 'حيوان بحري له ثمانية أذرع'], ['مغناطيس', 'يجذب الحديد إليه'], ['بانوراما', 'منظر واسع من جميع الجهات'], ['مستشفى', 'مكان لعلاج المرضى'], ['موسوعة', 'مجموعة كتب تجمع معلومات عن كل شيء'], ['متحف', 'مكان لعرض الآثار والتحف']],
+  },
 };
 
 function wordGame(ctx) {
-  const tier = ctx.tier, time = { star: 50, explorer: 45, master: 50 }[tier];
-  const words = shuffle(WORDS[tier]).slice(0, 3);
+  const tierId = ctx.tier, time = { star: 50, explorer: 45, master: 50 }[tierId];
+  const words = shuffle(WORDS[S.lang][tierId]).slice(0, 3);
   let w = 0, solved = 0;
   const next = () => {
-    if (w >= words.length) return ctx.done([`${solved} of ${words.length} words spelled`]);
+    if (w >= words.length) return ctx.done([t('spelled', solved, words.length)]);
     const [word, hint] = words[w++];
-    let letters; do { letters = shuffle(word.split('')); } while (letters.join('') === word);
-    const slots = Array(word.length).fill(null); // tile index per slot
+    const chars = [...word];
+    let letters; do { letters = shuffle(chars); } while (letters.join('') === word);
+    const slots = Array(chars.length).fill(null); // tile index per slot
     const locked = new Set();
     let hints = 0, busy = false;
-    ctx.stage.innerHTML = `<div class="q-count">Word ${w} of ${words.length}</div>
-      ${tier === 'star' ? `<div class="hint-emoji">${hint}</div>` : `<div class="hint-text">${esc(hint)}</div>`}
-      <div class="slots" id="slots">${slots.map((_, i) => `<button class="slot" data-i="${i}" aria-label="Letter ${i + 1}"></button>`).join('')}</div>
+    ctx.stage.innerHTML = `<div class="q-count">${t('wordOf', w, words.length)}</div>
+      ${tierId === 'star' ? `<div class="hint-emoji">${hint}</div>` : `<div class="hint-text">${esc(hint)}</div>`}
+      <div class="slots" id="slots">${slots.map((_, i) => `<button class="slot" data-i="${i}" aria-label="${t('letterN', i + 1)}"></button>`).join('')}</div>
+      ${S.lang === 'ar' ? '<div class="joined" id="joined" aria-live="polite"></div>' : ''}
       <div class="tiles" id="tiles">${letters.map((l, i) => `<button class="tile" data-t="${i}">${l}</button>`).join('')}</div>
-      <div class="row" style="width:100%;max-width:420px"><button class="btn ghost" id="hint">Hint</button><button class="btn ghost" id="skip">Skip</button></div>`;
+      <div class="row" style="width:100%;max-width:420px"><button class="btn ghost" id="hint">${t('hint')}</button><button class="btn ghost" id="skip">${t('skip')}</button></div>`;
     const slotEls = $$('.slot', ctx.stage), tileEls = $$('.tile', ctx.stage);
     const paint = () => {
       slotEls.forEach((s, i) => { s.textContent = slots[i] === null ? '' : letters[slots[i]]; s.classList.toggle('locked', locked.has(i)); });
-      tileEls.forEach((t, i) => t.classList.toggle('used', slots.includes(i)));
+      tileEls.forEach((el, i) => el.classList.toggle('used', slots.includes(i)));
     };
     const finish = ok => {
       busy = true;
       const f = ctx.timer.frac(); ctx.timer.stop();
-      if (ok) { solved++; ctx.add(Math.max(5, 20 + Math.round(13 * f) - 5 * hints)); Sound.good(); $('#slots').classList.add('ok'); }
-      else { Sound.bad(); slotEls.forEach((s, i) => { s.textContent = word[i]; }); $('#slots').classList.add('ok'); }
-      ctx.later(next, ok ? 900 : 1800);
+      if (ok) { solved++; ctx.add(Math.max(5, 20 + Math.round(13 * f) - 5 * hints)); Sound.good(); }
+      else { Sound.bad(); slotEls.forEach((s, i) => { s.textContent = chars[i]; }); }
+      $('#slots').classList.add('ok');
+      const joined = $('#joined'); if (joined) joined.textContent = word; // shows the letters connected
+      ctx.later(next, ok ? 1100 : 1900);
     };
     const check = () => {
       if (slots.includes(null)) return;
@@ -973,21 +1128,21 @@ function wordGame(ctx) {
       ctx.later(() => { $('#slots').classList.remove('no'); slots.forEach((_, i) => { if (!locked.has(i)) slots[i] = null; }); busy = false; paint(); }, 450);
     };
     const giveLetter = () => {
-      const pos = word.split('').findIndex((ch, i) => !locked.has(i));
+      const pos = chars.findIndex((_, i) => !locked.has(i));
       if (pos < 0) return;
       slots.forEach((_, i) => { if (!locked.has(i)) slots[i] = null; });
-      const t = letters.findIndex((l, i) => l === word[pos] && !slots.includes(i));
-      slots[pos] = t; locked.add(pos); paint();
+      slots[pos] = letters.findIndex((l, i) => l === chars[pos] && !slots.includes(i));
+      locked.add(pos); paint();
     };
-    tileEls.forEach((t, i) => t.onclick = () => {
+    tileEls.forEach((el, i) => el.onclick = () => {
       if (busy || slots.includes(i)) return;
       const s = slots.indexOf(null); if (s < 0) return;
       slots[s] = i; Sound.tap(); paint(); check();
     });
     slotEls.forEach((s, i) => s.onclick = () => { if (busy || locked.has(i) || slots[i] === null) return; slots[i] = null; Sound.flip(); paint(); });
-    $('#hint').onclick = () => { if (busy || locked.size >= word.length - 1) return; hints++; giveLetter(); Sound.tap(); check(); };
+    $('#hint').onclick = () => { if (busy || locked.size >= chars.length - 1) return; hints++; giveLetter(); Sound.tap(); check(); };
     $('#skip').onclick = () => { if (!busy) finish(false); };
-    if (tier === 'star') giveLetter(); // free first letter for the youngest
+    if (tierId === 'star') giveLetter(); // free first letter for the youngest
     paint();
     ctx.timer.start(time, () => { if (!busy) finish(false); });
   };
@@ -1001,8 +1156,8 @@ function memoryGame(ctx) {
   const faces = shuffle(MEM).slice(0, cfg.pairs);
   const deck = shuffle([...faces, ...faces]);
   const rows = deck.length / cfg.cols;
-  ctx.stage.innerHTML = `<div class="q-count" id="mstat">Find ${cfg.pairs} pairs</div>
-    <div class="mgrid" style="--cols:${cfg.cols};--rows:${rows}">${deck.map((f, i) => `<button class="card${cfg.peek ? ' up' : ''}" data-i="${i}" aria-label="Card ${i + 1}"><span class="in"><span class="back"></span><span class="face">${f}</span></span></button>`).join('')}</div>`;
+  ctx.stage.innerHTML = `<div class="q-count" id="mstat">${t('findPairs', cfg.pairs)}</div>
+    <div class="mgrid" style="--cols:${cfg.cols};--rows:${rows}">${deck.map((f, i) => `<button class="card${cfg.peek ? ' up' : ''}" data-i="${i}" aria-label="${t('cardN', i + 1)}"><span class="in"><span class="back"></span><span class="face">${f}</span></span></button>`).join('')}</div>`;
   const cards = $$('.card', ctx.stage);
   let open = [], found = 0, moves = 0, busy = true;
   const end = () => {
@@ -1012,7 +1167,7 @@ function memoryGame(ctx) {
     ctx.score = 0;
     ctx.add(50 * found / cfg.pairs + 30 * f + 20 * eff * found / cfg.pairs);
     if (found < cfg.pairs) { Sound.bad(); cards.forEach(c => c.classList.add('up')); }
-    ctx.done([`${found} of ${cfg.pairs} pairs found`, `${moves} moves`]);
+    ctx.done([t('pairsFound', found, cfg.pairs), t('moves', moves)]);
   };
   cards.forEach((c, i) => c.onclick = () => {
     if (busy || c.classList.contains('up') || c.classList.contains('done')) return;
@@ -1023,7 +1178,7 @@ function memoryGame(ctx) {
     if (deck[a] === deck[b]) {
       found++;
       ctx.later(() => { cards[a].classList.add('done'); cards[b].classList.add('done'); Sound.good(); }, 250);
-      $('#mstat').textContent = `${found} of ${cfg.pairs} pairs`;
+      $('#mstat').textContent = t('pairsOf', found, cfg.pairs);
       ctx.add(4);
       if (found === cfg.pairs) ctx.later(end, 600);
     } else {
@@ -1046,10 +1201,10 @@ function eyesGame(ctx) {
   const sets = shuffle(EYES[ctx.tier]);
   let r = 0, right = 0;
   const next = () => {
-    if (r >= cfg.sizes.length) return ctx.done([`${right} of ${cfg.sizes.length} spotted`]);
+    if (r >= cfg.sizes.length) return ctx.done([t('spotted', right, cfg.sizes.length)]);
     const n = cfg.sizes[r], pair = shuffle(sets[r % sets.length]); r++;
     const odd = rand(0, n * n - 1);
-    ctx.stage.innerHTML = `<div class="q-count">Find the different one · ${r} of ${cfg.sizes.length}</div>
+    ctx.stage.innerHTML = `<div class="q-count">${t('findOdd', r, cfg.sizes.length)}</div>
       <div class="egrid" style="--n:${n}">${Array.from({ length: n * n }, (_, i) => `<button data-i="${i}">${i === odd ? pair[1] : pair[0]}</button>`).join('')}</div>`;
     const cells = $$('.egrid button', ctx.stage);
     let locked = false;
@@ -1072,8 +1227,8 @@ function eyesGame(ctx) {
 }
 
 const RUN = {
-  math: ctx => quiz(ctx, t => pick(MATH[t])(), { star: 20, explorer: 15, master: 14 }[ctx.tier]),
-  pattern: ctx => quiz(ctx, t => pick(PATTERN[t])(), { star: 20, explorer: 18, master: 18 }[ctx.tier]),
+  math: ctx => quiz(ctx, tid => pick(MATH[tid])(), { star: 20, explorer: 15, master: 14 }[ctx.tier]),
+  pattern: ctx => quiz(ctx, tid => pick(PATTERN[tid])(), { star: 20, explorer: 18, master: 18 }[ctx.tier]),
   words: wordGame,
   memory: memoryGame,
   eyes: eyesGame,
@@ -1106,7 +1261,7 @@ function confetti() {
 }
 
 /* ---------- boot ---------- */
-const start = () => go(home);
+const start = () => { applyLang(); go(home); };
 window.claude?.hot?.ready ? window.claude.hot.ready(start) : start();
 })();
 </script>

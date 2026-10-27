@@ -1,6 +1,6 @@
 // Offline support: cache the game shell on install, then serve cache-first.
 // Bump VERSION whenever you change index.html so devices pick up the new game.
-const VERSION = 'brain-cup-v1';
+const VERSION = 'brain-cup-v2';
 const SHELL = [
   './',
   'index.html',
