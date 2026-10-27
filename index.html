@@ -1,0 +1,1276 @@
+<!doctype html>
+<!--standalone-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#211A3F">
+<meta name="description" content="Five quick brain games for the whole family. Everyone plays at their own level.">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Brain Cup">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/svg+xml" href="icons/icon.svg">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<style>
+  :root { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px) }
+  body { margin: 0; font: 14px system-ui, sans-serif }
+  img { max-width: 100% }
+  [hidden] { display: none !important }
+</style>
+<!--/standalone-->
+<title>Family Brain Cup</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Baloo+Bhaijaan+2:wght@600;700;800&family=Cairo:wght@600;700;800&family=Nunito:wght@600;700;800&display=swap">
+<style>
+/* Layout: one centred column like a game table at night; menus scroll, play screens fit one viewport. */
+:root {
+  --board: #211A3F;
+  --board-2: #2C2356;
+  --board-3: #3A2F6B;
+  --ink: #FFF6E6;
+  --muted: #B8ADD9;
+  --line: rgba(255, 246, 230, .14);
+  --sun: #FFC83D;
+  --sun-deep: #C48F12;
+  --sun-ink: #3B2A00;
+  --coral: #FF6A5C;
+  --mint: #36D6A4;
+  --sky: #4AB3FF;
+  --grape: #B48CFF;
+  --good: #36D6A4;
+  --bad: #FF6A5C;
+  --f-display: "Baloo 2", "Arial Rounded MT Bold", "Trebuchet MS", system-ui, sans-serif;
+  --f-body: "Nunito", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --r: 18px;
+  color-scheme: dark;
+}
+:root[lang="ar"] {
+  --f-display: "Baloo Bhaijaan 2", "Baloo 2", "Geeza Pro", "Noto Sans Arabic", system-ui, sans-serif;
+  --f-body: "Cairo", "Nunito", "Geeza Pro", "Noto Sans Arabic", system-ui, sans-serif;
+}
+/* Arabic letters must stay joined: no tracking, no case transforms. */
+:root[lang="ar"] * { letter-spacing: 0 !important; text-transform: none !important }
+:root[lang="ar"] h1, :root[lang="ar"] h2, :root[lang="ar"] h3 { line-height: 1.35 }
+[dir="rtl"] .timer i, [dir="rtl"] .stand .track i { transform-origin: right }
+html, body { height: 100% }
+body {
+  background:
+    radial-gradient(circle at 1px 1px, rgba(255, 246, 230, .06) 1px, transparent 0) 0 0 / 22px 22px,
+    var(--board);
+  color: var(--ink);
+  font-family: var(--f-body);
+  font-weight: 700;
+  font-size: 17px;
+  line-height: 1.45;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none;
+  user-select: none;
+  overscroll-behavior: none;
+}
+button, input { font: inherit; color: inherit }
+button { touch-action: manipulation; cursor: pointer }
+:focus-visible { outline: 3px solid var(--sky); outline-offset: 3px }
+h1, h2, h3 { font-family: var(--f-display); font-weight: 800; line-height: 1.05; margin: 0; text-wrap: balance }
+
+.shell {
+  max-width: 760px;
+  margin: 0 auto;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 8px 24px;
+  box-sizing: border-box;
+}
+.bar { display: flex; align-items: center; gap: 12px; min-height: 52px }
+.bar-title { flex: 1; text-align: center; font-family: var(--f-display); font-size: 18px; color: var(--muted); letter-spacing: .02em }
+.icon-btn {
+  width: 44px; height: 44px; border-radius: 14px;
+  border: 1.5px solid var(--line); background: var(--board-2);
+  display: grid; place-items: center; padding: 0;
+}
+.icon-btn svg { width: 22px; height: 22px; fill: none; stroke: var(--ink); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round }
+.icon-btn[aria-pressed="false"] svg { stroke: var(--muted) }
+.lang-btn { font-family: "Baloo Bhaijaan 2", "Baloo 2", system-ui, sans-serif; font-size: 18px; font-weight: 800; letter-spacing: 0 !important }
+main { flex: 1; display: flex; flex-direction: column; gap: 22px; padding-top: 8px }
+
+/* Buttons */
+.btn {
+  border: 0; border-radius: 16px; padding: 14px 22px; min-height: 56px;
+  font-family: var(--f-display); font-weight: 800; font-size: 20px; letter-spacing: .01em;
+  background: var(--board-3); color: var(--ink);
+  box-shadow: 0 5px 0 rgba(0, 0, 0, .35);
+  transition: transform .08s, box-shadow .08s;
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+}
+.btn:active:not(:disabled) { transform: translateY(4px); box-shadow: 0 1px 0 rgba(0, 0, 0, .35) }
+.btn.primary { background: var(--sun); color: var(--sun-ink); box-shadow: 0 5px 0 var(--sun-deep) }
+.btn.primary:active:not(:disabled) { box-shadow: 0 1px 0 var(--sun-deep) }
+.btn.ghost { background: transparent; border: 2px solid var(--line); box-shadow: none }
+.btn.danger { background: var(--coral); color: #2B0500; box-shadow: 0 5px 0 #A83126 }
+.btn.big { font-size: 24px; min-height: 68px; padding-inline: 28px }
+.btn:disabled { opacity: .45; cursor: not-allowed }
+.btn.wide { width: 100% }
+.row { display: flex; gap: 12px; flex-wrap: wrap }
+.row > .btn { flex: 1 1 160px }
+
+.eyebrow { font-size: 13px; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); font-weight: 800 }
+.muted { color: var(--muted) }
+.section { display: flex; flex-direction: column; gap: 12px }
+.section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px }
+
+/* Home */
+.hero { display: grid; grid-template-columns: auto 1fr; gap: 18px; align-items: center; padding-top: 6px }
+.hero svg { width: clamp(88px, 22vw, 132px); height: auto; animation: bob 3.2s ease-in-out infinite }
+.hero h1 { font-size: clamp(40px, 9vw, 64px); color: var(--sun); letter-spacing: -.01em }
+.hero p { margin: 6px 0 0; color: var(--muted); max-width: 34ch }
+@keyframes bob { 50% { transform: translateY(-6px) rotate(-3deg) } }
+
+.players { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px }
+.pcard {
+  display: flex; align-items: center; gap: 10px; text-align: start;
+  border: 2px solid var(--line); border-radius: var(--r); background: var(--board-2);
+  padding: 10px 12px; min-height: 64px; min-width: 0;
+}
+.pcard .who { min-width: 0 }
+.pcard .name { font-family: var(--f-display); font-size: 20px; line-height: 1.1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+.avatar {
+  width: 46px; height: 46px; flex: none; border-radius: 50%;
+  display: grid; place-items: center; font-size: 28px;
+  background: color-mix(in srgb, var(--t, var(--sky)) 28%, var(--board-3));
+  box-shadow: inset 0 0 0 3px var(--t, var(--sky));
+}
+.avatar.xl { width: 120px; height: 120px; font-size: 72px; box-shadow: inset 0 0 0 6px var(--t) }
+.add-card { justify-content: center; border-style: dashed; color: var(--muted); font-family: var(--f-display); font-size: 19px }
+.tier-tag {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em;
+  color: var(--t);
+}
+.tier-tag::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--t) }
+[data-tier="star"] { --t: var(--sun) }
+[data-tier="explorer"] { --t: var(--mint) }
+[data-tier="master"] { --t: var(--coral) }
+
+.levels { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px }
+.level { border-radius: var(--r); padding: 14px; background: var(--board-2); border-top: 6px solid var(--t); min-width: 0 }
+.level h3 { font-size: 21px; color: var(--t) }
+.level .ages { font-size: 14px; color: var(--ink) }
+.level p { margin: 6px 0 0; font-size: 14px; color: var(--muted); line-height: 1.35 }
+
+.games { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px }
+.gtile {
+  display: flex; gap: 12px; align-items: center; text-align: start;
+  padding: 12px; border-radius: var(--r); background: var(--board-2); border: 2px solid transparent; min-width: 0;
+}
+.gtile .gicon {
+  width: 48px; height: 48px; flex: none; border-radius: 14px; display: grid; place-items: center; font-size: 26px;
+  background: var(--g);
+}
+.gtile b { font-family: var(--f-display); font-size: 19px; font-weight: 800; display: block; line-height: 1.1 }
+.gtile span { font-size: 13.5px; color: var(--muted); line-height: 1.3; display: block }
+.gtile.selectable[aria-pressed="true"] { border-color: var(--g); background: color-mix(in srgb, var(--g) 16%, var(--board-2)) }
+.gtile.selectable[aria-pressed="false"] { opacity: .55 }
+[data-game="math"] { --g: var(--sky) }
+[data-game="memory"] { --g: var(--grape) }
+[data-game="words"] { --g: var(--mint) }
+[data-game="pattern"] { --g: var(--coral) }
+[data-game="eyes"] { --g: var(--sun) }
+
+.install-tip { border: 2px dashed var(--line); border-radius: var(--r); padding: 12px 14px; font-size: 15px; color: var(--muted) }
+.install-tip b { color: var(--ink) }
+
+/* Forms */
+.field { display: flex; flex-direction: column; gap: 6px }
+.field label { font-size: 13px; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); font-weight: 800 }
+.input {
+  font-size: 22px; padding: 12px 16px; border-radius: 14px; border: 2px solid var(--line);
+  background: var(--board-2); min-height: 56px; box-sizing: border-box; width: 100%;
+  -webkit-user-select: text; user-select: text;
+}
+.input:focus { outline: none; border-color: var(--sky) }
+.form-grid { display: grid; grid-template-columns: 1fr 120px; gap: 12px }
+.avatars { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px }
+.avatars button {
+  aspect-ratio: 1; font-size: clamp(24px, 6vw, 34px); border-radius: 14px; border: 2px solid var(--line); background: var(--board-2); padding: 0;
+}
+.avatars button[aria-pressed="true"] { border-color: var(--sun); background: color-mix(in srgb, var(--sun) 22%, var(--board-2)) }
+.seg { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px }
+.seg button {
+  border-radius: 14px; border: 2px solid var(--line); background: var(--board-2); padding: 10px 6px; min-height: 64px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+}
+.seg button b { font-family: var(--f-display); font-size: 18px; line-height: 1.1 }
+.seg button small { font-size: 12.5px; color: var(--muted) }
+.seg button[aria-pressed="true"] { border-color: var(--t, var(--sun)); background: color-mix(in srgb, var(--t, var(--sun)) 20%, var(--board-2)) }
+.seg.numbers button b { font-size: 26px }
+.pick-players { display: flex; flex-wrap: wrap; gap: 8px }
+.pick-players button { display: flex; align-items: center; gap: 8px; padding-block: 6px; padding-inline: 6px 14px; border-radius: 999px; border: 2px solid var(--line); background: var(--board-2); font-family: var(--f-display); font-size: 18px; min-height: 52px }
+.pick-players button .avatar { width: 38px; height: 38px; font-size: 22px }
+.pick-players button[aria-pressed="true"] { border-color: var(--t) }
+.pick-players button[aria-pressed="false"] { opacity: .5 }
+
+/* Interstitials */
+.center { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 18px; padding-block: 12px }
+.center h2 { font-size: clamp(34px, 8vw, 54px) }
+.center p { margin: 0; color: var(--muted); max-width: 36ch }
+.big-icon { width: 112px; height: 112px; border-radius: 30px; display: grid; place-items: center; font-size: 62px; background: var(--g); box-shadow: 0 8px 0 rgba(0,0,0,.3) }
+.lineup { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px }
+.lineup .pill { display: flex; align-items: center; gap: 6px; padding-block: 4px; padding-inline: 4px 12px; border-radius: 999px; background: var(--board-2) }
+.lineup .avatar { width: 34px; height: 34px; font-size: 20px }
+.points { font-family: var(--f-display); font-size: clamp(64px, 18vw, 110px); line-height: 1; color: var(--sun); font-variant-numeric: tabular-nums }
+.detail { list-style: none; padding: 0; margin: 0; color: var(--muted) }
+
+.standings { display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 520px }
+.stand { display: grid; grid-template-columns: 28px 46px 1fr auto; gap: 10px; align-items: center; text-align: start }
+.stand .rank { font-family: var(--f-display); font-size: 22px; color: var(--muted) }
+.stand .bar-wrap { min-width: 0 }
+.stand .nm { font-family: var(--f-display); font-size: 19px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis }
+.stand .track { height: 10px; border-radius: 6px; background: var(--board-3); overflow: hidden }
+.stand .track i { display: block; height: 100%; background: var(--t); border-radius: 6px; transform-origin: left; animation: grow .8s ease-out both }
+.stand .sc { font-family: var(--f-display); font-size: 24px; font-variant-numeric: tabular-nums }
+.stand .sc small { display: block; font-size: 13px; color: var(--mint); text-align: end; font-family: var(--f-body) }
+@keyframes grow { from { transform: scaleX(0) } }
+
+.podium { display: flex; align-items: flex-end; justify-content: center; gap: 10px; width: 100%; max-width: 520px }
+.step { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; min-width: 0 }
+.step .block { width: 100%; border-radius: 14px 14px 4px 4px; background: var(--board-3); display: grid; place-items: center; font-family: var(--f-display); font-size: 34px; color: var(--muted); border-top: 6px solid var(--t) }
+.step.p1 .block { height: 130px; background: color-mix(in srgb, var(--sun) 30%, var(--board-3)); color: var(--sun) }
+.step.p2 .block { height: 96px }
+.step.p3 .block { height: 70px }
+.step .nm { font-family: var(--f-display); font-size: 18px; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+.step .sc { color: var(--muted); font-variant-numeric: tabular-nums }
+
+/* Play */
+.play { flex: 1; display: flex; flex-direction: column; gap: 12px; min-height: 0 }
+.play-head { display: flex; align-items: center; gap: 10px }
+.play-head .avatar { width: 42px; height: 42px; font-size: 24px }
+.play-head .who { flex: 1; min-width: 0 }
+.play-head .name { font-family: var(--f-display); font-size: 20px; line-height: 1.1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis }
+.live { font-family: var(--f-display); font-size: 34px; color: var(--sun); font-variant-numeric: tabular-nums; min-width: 2.2ch; text-align: right }
+.live.pop { animation: pop .35s }
+@keyframes pop { 40% { transform: scale(1.3) } }
+.timer { height: 12px; border-radius: 8px; background: var(--board-3); overflow: hidden }
+.timer i { display: block; height: 100%; background: var(--mint); transform-origin: left; border-radius: 8px }
+.timer i.low { background: var(--coral) }
+.stage { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; text-align: center; min-height: 0 }
+.q-count { color: var(--muted); font-size: 14px; text-transform: uppercase; letter-spacing: .12em }
+.q-label { font-family: var(--f-display); font-size: 26px }
+.q-big { font-family: var(--f-display); font-size: clamp(44px, 12vw, 76px); line-height: 1.1; font-variant-numeric: tabular-nums }
+.q-help { font-size: 30px; letter-spacing: 2px; line-height: 1.3; max-width: 100% }
+.q-help s { opacity: .25; text-decoration: none }
+.count-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 10px; font-size: clamp(38px, 10vw, 56px); max-width: 520px }
+.choices { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; max-width: 560px }
+.choice {
+  min-height: 84px; border-radius: 18px; border: 0; background: var(--board-3);
+  font-family: var(--f-display); font-size: clamp(30px, 8vw, 42px); font-weight: 800; font-variant-numeric: tabular-nums;
+  box-shadow: 0 5px 0 rgba(0,0,0,.35);
+}
+.choice:active:not(:disabled) { transform: translateY(4px); box-shadow: 0 1px 0 rgba(0,0,0,.35) }
+.choice.right { background: var(--good); color: #002A1C }
+.choice.wrong { background: var(--bad); color: #2B0500; animation: shake .4s }
+.choice:disabled { cursor: default }
+.seq { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; max-width: 100% }
+.seq span {
+  min-width: 58px; height: 64px; padding: 0 10px; box-sizing: border-box; border-radius: 14px; background: var(--board-2);
+  display: grid; place-items: center; font-family: var(--f-display); font-size: 32px; font-variant-numeric: tabular-nums;
+}
+.seq span.ask { background: transparent; border: 3px dashed var(--coral); color: var(--coral) }
+
+/* Words */
+.hint-emoji { font-size: clamp(80px, 22vw, 120px); line-height: 1 }
+.hint-text { font-size: 22px; max-width: 26ch; line-height: 1.3 }
+.slots, .tiles { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; max-width: 100% }
+.slot, .tile {
+  width: clamp(40px, 10.5vw, 60px); height: clamp(50px, 12.5vw, 68px); border-radius: 12px;
+  display: grid; place-items: center; font-family: var(--f-display); font-size: clamp(26px, 7vw, 38px); padding: 0;
+}
+.slot { border: 0; background: var(--board-2); border-bottom: 4px solid var(--line) }
+.slot.locked { color: var(--mint) }
+.joined { font-family: var(--f-display); font-size: 40px; min-height: 1.4em; color: var(--mint) }
+.slots.ok .slot { background: var(--good); color: #002A1C }
+.slots.no { animation: shake .4s }
+.tile { border: 0; background: var(--ink); color: var(--board); box-shadow: 0 5px 0 #B9A98C }
+.tile:active { transform: translateY(4px); box-shadow: 0 1px 0 #B9A98C }
+.tile.used { visibility: hidden }
+@keyframes shake { 20%, 60% { transform: translateX(-8px) } 40%, 80% { transform: translateX(8px) } }
+
+/* Memory */
+.mgrid { display: grid; grid-template-columns: repeat(var(--cols), 1fr); gap: 10px; width: 100%; max-width: min(100%, calc((100dvh - 230px) * var(--cols) / var(--rows) * .82)) }
+.card { aspect-ratio: 4 / 5; border: 0; padding: 0; background: none; perspective: 600px }
+.card .in { position: relative; display: block; width: 100%; height: 100%; transition: transform .35s; transform-style: preserve-3d }
+.card.up .in, .card.done .in { transform: rotateY(180deg) }
+.card .face, .card .back { position: absolute; inset: 0; border-radius: 14px; display: grid; place-items: center; backface-visibility: hidden; -webkit-backface-visibility: hidden }
+.card .back { background: var(--grape); box-shadow: inset 0 0 0 4px rgba(255,255,255,.25); background-image: radial-gradient(circle, rgba(255,255,255,.35) 2px, transparent 3px); background-size: 16px 16px }
+.card .face { background: var(--ink); transform: rotateY(180deg); font-size: clamp(30px, 9vw, 52px) }
+.card.done .face { background: color-mix(in srgb, var(--good) 45%, var(--ink)) }
+
+/* Sharp eyes */
+.egrid { display: grid; grid-template-columns: repeat(var(--n), 1fr); gap: 6px; width: 100%; max-width: min(100%, calc(100dvh - 250px)) }
+.egrid button { aspect-ratio: 1; border: 0; border-radius: 12px; background: var(--board-2); padding: 0; font-size: calc(min(100vw, 560px) / var(--n) * .52); line-height: 1 }
+.egrid button.right { background: var(--good) }
+.egrid button.wrong { background: var(--bad); animation: shake .3s }
+
+.table-wrap { overflow-x: auto; width: 100% }
+table.fame { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums }
+.fame th { font-size: 12px; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); text-align: end; padding: 6px 8px; font-weight: 800 }
+.fame th:first-child, .fame td:first-child { text-align: start }
+.fame td { padding: 10px 8px; border-top: 1px solid var(--line); text-align: end; font-size: 17px }
+.fame .who { display: flex; align-items: center; gap: 8px; font-family: var(--f-display); font-size: 19px; white-space: nowrap }
+.fame .avatar { width: 34px; height: 34px; font-size: 20px }
+
+.modal { position: fixed; inset: 0; background: rgba(10, 6, 25, .7); display: grid; place-items: center; z-index: 30; padding: 20px }
+.sheet { background: var(--board-2); border-radius: 22px; padding: 22px; max-width: 380px; width: 100%; display: flex; flex-direction: column; gap: 18px; text-align: center; border: 2px solid var(--line) }
+.sheet p { margin: 0; font-size: 19px }
+
+#confetti { position: fixed; inset: 0; pointer-events: none; z-index: 20; width: 100%; height: 100% }
+
+@media (max-width: 560px) {
+  .levels { grid-template-columns: 1fr }
+  .level { display: grid; grid-template-columns: 110px 1fr; gap: 4px 12px; border-top: 0; border-inline-start: 6px solid var(--t) }
+  .level p { margin: 0; grid-column: 2; grid-row: 1 / span 2; align-self: center }
+  .form-grid { grid-template-columns: 1fr 96px }
+  .choice { min-height: 76px }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important }
+}
+</style>
+<!--standalone-->
+</head>
+<body>
+<!--/standalone-->
+<div class="shell">
+  <header class="bar">
+    <button class="icon-btn" id="homeBtn" aria-label="Home">
+      <svg viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 9.5V20h13V9.5"/></svg>
+    </button>
+    <div class="bar-title" id="barTitle"></div>
+    <button class="icon-btn lang-btn" id="langBtn" aria-label="العربية">ع</button>
+    <button class="icon-btn" id="soundBtn" aria-label="Sound" aria-pressed="true">
+      <svg viewBox="0 0 24 24"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path class="wave" d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/></svg>
+    </button>
+  </header>
+  <main id="app"></main>
+</div>
+<canvas id="confetti" hidden></canvas>
+
+<script>
+(() => {
+'use strict';
+
+/* ---------- helpers ---------- */
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const rand = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
+const pick = arr => arr[Math.floor(Math.random() * arr.length)];
+const shuffle = arr => { const a = [...arr]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const uid = () => Math.random().toString(36).slice(2, 9);
+
+const store = {
+  get(k, d) { try { const v = localStorage.getItem('fbc.' + k); return v ? JSON.parse(v) : d; } catch { return d; } },
+  set(k, v) { try { localStorage.setItem('fbc.' + k, JSON.stringify(v)); } catch { /* storage unavailable */ } },
+};
+
+/* ---------- text ---------- */
+// Arabic strings use Western digits in the source; they are shown as Arabic-Indic digits on screen (see localize below).
+const L = {
+  en: {
+    appName: 'Family Brain Cup',
+    tagline: 'Five quick brain games. Everyone plays at their own level, so the youngest can beat the grown-ups.',
+    players: 'Players',
+    playerCount: n => n === 1 ? '1 player' : `${n} players`,
+    addEveryone: 'Add everyone who will play',
+    addPlayerCard: '+ Add player',
+    startCup: 'Start a family cup',
+    practice: 'Practice',
+    fame: 'Hall of fame',
+    install: 'Install on this device',
+    iosTip: 'Play it like an app: tap <b>Share</b> then <b>Add to Home Screen</b>. It works offline after that.',
+    threeLevels: 'Three levels',
+    fiveGames: 'Five games',
+    tiers: {
+      star: { name: 'Little Star', ages: 'Ages 5–8', blurb: 'Counting, simple sums, 3-letter words, colour patterns' },
+      explorer: { name: 'Explorer', ages: 'Ages 9–14', blurb: 'Times tables, number sequences, longer words' },
+      master: { name: 'Master', ages: 'Ages 15+', blurb: 'Mental maths, percentages, tricky patterns, big words' },
+    },
+    games: {
+      math: { name: 'Number Sprint', how: 'Answer 5 sums before the clock runs out.' },
+      memory: { name: 'Memory Match', how: 'Flip two cards at a time and find every pair.' },
+      words: { name: 'Word Builder', how: 'Tap the letters in order to spell the word.' },
+      pattern: { name: 'What Comes Next?', how: 'Work out the next item in the pattern.' },
+      eyes: { name: 'Sharp Eyes', how: 'Spot the one picture that is different.' },
+    },
+    editPlayer: 'Edit player', newPlayer: 'New player', name: 'Name', namePh: 'e.g. Sara', age: 'Age', level: 'Level',
+    pickAnimal: 'Pick an animal', remove: 'Remove', save: 'Save', addPlayer: 'Add player', cancel: 'Cancel',
+    removeQ: n => `Remove ${n} and their trophies?`,
+    newCup: 'New cup', whoPlaying: 'Who is playing?', rounds: 'Rounds', roundTime: ['about 5 min', 'about 10 min', 'about 15 min'],
+    gamesInCup: 'Games in this cup', startTheCup: 'Start the cup',
+    roundOf: (r, n) => `Round ${r} of ${n}`, round: r => `Round ${r}`,
+    ownLevel: 'Each player gets puzzles for their own level.', letsGo: "Let's go",
+    passTo: 'Pass the device to', yourTurn: 'Your turn', ready: "I'm ready",
+    scored: n => `${n} scored`, cupTotal: 'Cup total:', nextP: n => `Next: ${n}`, seeScores: 'See the scores',
+    afterRound: (r, n) => `After round ${r} of ${n}`, scoreboard: 'Scoreboard', crown: 'Crown the winner', nextRound: (r, g) => `Round ${r}: ${g}`,
+    cupFinished: 'Cup finished', shared: 'A shared victory', goesTo: 'The cup goes to', and: ' & ', home: 'Home', playAgain: 'Play again',
+    whoPractising: 'Who is practising?', pickGame: 'Pick a game', otherGames: 'Other games',
+    newBest: p => `New personal best! Old best was ${p}.`, firstScore: 'First score on the board!', bestWas: p => `Personal best: ${p}`,
+    fameNote: "Game columns show each player's best score, out of about 100.", noPlayers: 'No players yet. Add your family on the home screen.',
+    thPlayer: 'Player', thCups: 'Cups', thPlayed: 'Played', thBest: g => `Best ${g}`,
+    leaveCup: 'Leave this cup? The scores so far will be lost.', stopGame: 'Stop this game?', leave: 'Leave', keepPlaying: 'Keep playing',
+    question: (i, n) => `Question ${i} of ${n}`, correct: (r, n) => `${r} of ${n} correct`,
+    howMany: 'How many?', biggest: 'Which number is the biggest?', pctOf: (p, n) => `${p}% of ${n}`, fracOf: (m, d, x) => `${m}/${d} of ${x}`,
+    whatNext: 'What comes next?', ask: '?',
+    wordOf: (w, n) => `Word ${w} of ${n}`, hint: 'Hint', skip: 'Skip', letterN: i => `Letter ${i}`, spelled: (s, n) => `${s} of ${n} words spelled`,
+    findPairs: n => `Find ${n} pairs`, pairsOf: (f, n) => `${f} of ${n} pairs`, pairsFound: (f, n) => `${f} of ${n} pairs found`, moves: m => `${m} moves`, cardN: i => `Card ${i}`,
+    findOdd: (r, n) => `Find the different one · ${r} of ${n}`, spotted: (r, n) => `${r} of ${n} spotted`,
+    homeBtn: 'Home', soundOn: 'Sound on', soundOff: 'Sound off', switchLang: 'العربية',
+  },
+  ar: {
+    appName: 'كأس الأذكياء',
+    tagline: 'خمس ألعاب ذكاء سريعة. كل لاعب يلعب حسب مستواه، لذلك يستطيع الأصغر أن يفوز على الكبار.',
+    players: 'اللاعبون',
+    playerCount: n => n === 1 ? 'لاعب واحد' : n === 2 ? 'لاعبان' : n <= 10 ? `${n} لاعبين` : `${n} لاعبًا`,
+    addEveryone: 'أضف كل من سيلعب',
+    addPlayerCard: '+ إضافة لاعب',
+    startCup: 'ابدأ كأس العائلة',
+    practice: 'تدريب',
+    fame: 'لوحة الأبطال',
+    install: 'ثبّت اللعبة على هذا الجهاز',
+    iosTip: 'العبها كتطبيق: اضغط <b>مشاركة</b> ثم <b>إضافة إلى الشاشة الرئيسية</b>. بعدها تعمل بدون إنترنت.',
+    threeLevels: 'ثلاثة مستويات',
+    fiveGames: 'خمس ألعاب',
+    tiers: {
+      star: { name: 'نجمة صغيرة', ages: 'من 5 إلى 8 سنوات', blurb: 'العدّ، جمع وطرح بسيط، كلمات من 3 حروف، أنماط الألوان' },
+      explorer: { name: 'مستكشف', ages: 'من 9 إلى 14 سنة', blurb: 'جدول الضرب، متتاليات الأعداد، كلمات أطول' },
+      master: { name: 'خبير', ages: '15 سنة فأكثر', blurb: 'حساب ذهني، نسب مئوية، أنماط صعبة، كلمات طويلة' },
+    },
+    games: {
+      math: { name: 'سباق الأرقام', how: 'أجب عن 5 مسائل قبل انتهاء الوقت.' },
+      memory: { name: 'لعبة الذاكرة', how: 'اقلب بطاقتين في كل مرة وابحث عن كل الأزواج.' },
+      words: { name: 'بنّاء الكلمات', how: 'اضغط على الحروف بالترتيب لتكوين الكلمة.' },
+      pattern: { name: 'ماذا بعد؟', how: 'اكتشف العنصر التالي في النمط.' },
+      eyes: { name: 'عين الصقر', how: 'جد الصورة الوحيدة المختلفة.' },
+    },
+    editPlayer: 'تعديل لاعب', newPlayer: 'لاعب جديد', name: 'الاسم', namePh: 'مثلًا: سارة', age: 'العمر', level: 'المستوى',
+    pickAnimal: 'اختر حيوانًا', remove: 'حذف', save: 'حفظ', addPlayer: 'إضافة اللاعب', cancel: 'إلغاء',
+    removeQ: n => `حذف «${n}» مع كل النتائج والكؤوس؟`,
+    newCup: 'كأس جديدة', whoPlaying: 'من سيلعب؟', rounds: 'عدد الجولات', roundTime: ['حوالي 5 دقائق', 'حوالي 10 دقائق', 'حوالي 15 دقيقة'],
+    gamesInCup: 'ألعاب هذه الكأس', startTheCup: 'ابدأ الكأس',
+    roundOf: (r, n) => `الجولة ${r} من ${n}`, round: r => `الجولة ${r}`,
+    ownLevel: 'كل لاعب يحصل على ألغاز تناسب مستواه.', letsGo: 'هيا بنا',
+    passTo: 'أعطِ الجهاز إلى', yourTurn: 'دورك', ready: 'ابدأ',
+    scored: n => `نتيجة ${n}`, cupTotal: 'المجموع في الكأس:', nextP: n => `التالي: ${n}`, seeScores: 'شاهد النتائج',
+    afterRound: (r, n) => `بعد الجولة ${r} من ${n}`, scoreboard: 'لوحة النتائج', crown: 'توّج الفائز', nextRound: (r, g) => `الجولة ${r}: ${g}`,
+    cupFinished: 'انتهت الكأس', shared: 'فوز مشترك', goesTo: 'الكأس من نصيب', and: ' و', home: 'الرئيسية', playAgain: 'العب مرة أخرى',
+    whoPractising: 'من سيتدرب؟', pickGame: 'اختر لعبة', otherGames: 'ألعاب أخرى',
+    newBest: p => `رقم قياسي جديد! أفضل نتيجة سابقة كانت ${p}.`, firstScore: 'أول نتيجة مسجلة!', bestWas: p => `أفضل نتيجة: ${p}`,
+    fameNote: 'أعمدة الألعاب تعرض أفضل نتيجة لكل لاعب، من حوالي 100.', noPlayers: 'لا يوجد لاعبون بعد. أضف عائلتك من الشاشة الرئيسية.',
+    thPlayer: 'اللاعب', thCups: 'الكؤوس', thPlayed: 'المباريات', thBest: g => `أفضل نتيجة في ${g}`,
+    leaveCup: 'الخروج من الكأس؟ ستضيع النتائج الحالية.', stopGame: 'إيقاف هذه اللعبة؟', leave: 'خروج', keepPlaying: 'متابعة اللعب',
+    question: (i, n) => `السؤال ${i} من ${n}`, correct: (r, n) => `إجابات صحيحة: ${r} من ${n}`,
+    howMany: 'كم عددها؟', biggest: 'أي عدد هو الأكبر؟', pctOf: (p, n) => `${p}٪ من ${n}`, fracOf: (m, d, x) => `${m}/${d} من ${x}`,
+    whatNext: 'ماذا بعد؟', ask: '؟',
+    wordOf: (w, n) => `الكلمة ${w} من ${n}`, hint: 'تلميح', skip: 'تخطَّ', letterN: i => `الحرف ${i}`, spelled: (s, n) => `كلمات صحيحة: ${s} من ${n}`,
+    findPairs: n => `الأزواج المطلوبة: ${n}`, pairsOf: (f, n) => `الأزواج: ${f} من ${n}`, pairsFound: (f, n) => `الأزواج المكتشفة: ${f} من ${n}`, moves: m => `عدد الحركات: ${m}`, cardN: i => `البطاقة ${i}`,
+    findOdd: (r, n) => `جد المختلف · ${r} من ${n}`, spotted: (r, n) => `اكتشفت ${r} من ${n}`,
+    homeBtn: 'الرئيسية', soundOn: 'الصوت يعمل', soundOff: 'الصوت مغلق', switchLang: 'English',
+  },
+};
+
+const GAME_IDS = ['math', 'memory', 'words', 'pattern', 'eyes'];
+const GAME_ICONS = { math: '🔢', memory: '🃏', words: '🔤', pattern: '🧩', eyes: '👀' };
+const TIER_IDS = ['star', 'explorer', 'master'];
+const tierForAge = a => a <= 8 ? 'star' : a <= 14 ? 'explorer' : 'master';
+const AVATARS = ['🦊', '🐼', '🐯', '🦁', '🐸', '🐵', '🦄', '🐙', '🐧', '🐨', '🐲', '🦖'];
+
+/* ---------- state ---------- */
+const defaultLang = () => { try { return (navigator.language || '').toLowerCase().startsWith('ar') ? 'ar' : 'en'; } catch { return 'en'; } };
+const S = {
+  players: store.get('players', []),
+  sound: store.get('sound', true),
+  lang: store.get('lang', null) || defaultLang(),
+  cup: null,
+  cleanup: null,
+  inPlay: false,
+};
+const savePlayers = () => store.set('players', S.players);
+const byId = id => S.players.find(p => p.id === id);
+
+const t = (k, ...a) => { const v = L[S.lang][k] ?? L.en[k]; return typeof v === 'function' ? v(...a) : v; };
+const tier = id => t('tiers')[id];
+const game = id => ({ icon: GAME_ICONS[id], ...t('games')[id] });
+
+/* Arabic-Indic digits for everything shown on screen while Arabic is on */
+const AR_DIGITS = '٠١٢٣٤٥٦٧٨٩';
+const localize = node => {
+  if (S.lang !== 'ar') return;
+  if (node.nodeType === 3) {
+    const tag = node.parentNode && node.parentNode.nodeName;
+    if (tag !== 'STYLE' && tag !== 'SCRIPT' && /[0-9]/.test(node.data)) node.data = node.data.replace(/[0-9]/g, d => AR_DIGITS[d]);
+    return;
+  }
+  if (node.nodeType === 1 && node.nodeName !== 'STYLE' && node.nodeName !== 'SCRIPT') node.childNodes.forEach(localize);
+};
+new MutationObserver(muts => muts.forEach(m => {
+  if (m.type === 'characterData') localize(m.target); else m.addedNodes.forEach(localize);
+})).observe(document.body, { childList: true, subtree: true, characterData: true });
+
+/* ---------- sound ---------- */
+const Sound = (() => {
+  let ctx;
+  const ensure = () => {
+    if (!S.sound) return null;
+    try {
+      ctx = ctx || new (window.AudioContext || window.webkitAudioContext)();
+      if (ctx.state === 'suspended') ctx.resume();
+    } catch { return null; }
+    return ctx;
+  };
+  const tone = (freq, dur = .12, type = 'sine', when = 0, vol = .15) => {
+    const c = ensure(); if (!c) return;
+    const t0 = c.currentTime + when, o = c.createOscillator(), g = c.createGain();
+    o.type = type; o.frequency.setValueAtTime(freq, t0);
+    g.gain.setValueAtTime(.0001, t0);
+    g.gain.exponentialRampToValueAtTime(vol, t0 + .01);
+    g.gain.exponentialRampToValueAtTime(.0001, t0 + dur);
+    o.connect(g).connect(c.destination); o.start(t0); o.stop(t0 + dur + .02);
+  };
+  return {
+    unlock: ensure,
+    tap: () => tone(660, .06, 'triangle', 0, .08),
+    good: () => { tone(784, .1, 'triangle'); tone(1047, .16, 'triangle', .08); },
+    bad: () => { tone(220, .18, 'sawtooth', 0, .06); tone(170, .22, 'sawtooth', .1, .05); },
+    flip: () => tone(520, .05, 'square', 0, .035),
+    tick: () => tone(1250, .03, 'square', 0, .03),
+    win: () => [523, 659, 784, 1047, 1319].forEach((f, i) => tone(f, .24, 'triangle', i * .12, .13)),
+  };
+})();
+const buzz = ms => { try { navigator.vibrate && navigator.vibrate(ms); } catch { /* not supported */ } };
+
+/* ---------- shell ---------- */
+const app = $('#app');
+const langBtn = $('#langBtn');
+const soundBtn = $('#soundBtn');
+const setTitle = s => { $('#barTitle').textContent = s || ''; };
+
+function go(render, ...args) {
+  if (S.cleanup) { S.cleanup(); S.cleanup = null; }
+  S.inPlay = false;
+  langBtn.hidden = render !== home;
+  app.innerHTML = '';
+  window.scrollTo(0, 0);
+  render(...args);
+}
+
+function ask(msg, yes, no) {
+  return new Promise(res => {
+    const m = document.createElement('div');
+    m.className = 'modal';
+    m.innerHTML = `<div class="sheet" role="dialog" aria-modal="true"><p>${esc(msg)}</p>
+      <div class="row"><button class="btn ghost" data-a="0">${esc(no)}</button><button class="btn danger" data-a="1">${esc(yes)}</button></div></div>`;
+    document.body.append(m);
+    $('[data-a="0"]', m).focus();
+    m.addEventListener('click', e => {
+      const b = e.target.closest('[data-a]');
+      if (!b) return;
+      m.remove();
+      res(b.dataset.a === '1');
+    });
+  });
+}
+
+const paintSound = () => {
+  soundBtn.setAttribute('aria-pressed', String(S.sound));
+  soundBtn.setAttribute('aria-label', S.sound ? t('soundOn') : t('soundOff'));
+  $('.wave', soundBtn).style.display = S.sound ? '' : 'none';
+};
+function applyLang() {
+  const root = document.documentElement;
+  root.lang = S.lang;
+  root.dir = S.lang === 'ar' ? 'rtl' : 'ltr';
+  document.title = t('appName');
+  langBtn.textContent = S.lang === 'ar' ? 'EN' : 'ع';
+  langBtn.setAttribute('aria-label', t('switchLang'));
+  $('#homeBtn').setAttribute('aria-label', t('homeBtn'));
+  paintSound();
+}
+
+$('#homeBtn').addEventListener('click', async () => {
+  if (S.cup || S.inPlay) {
+    const leave = await ask(S.cup ? t('leaveCup') : t('stopGame'), t('leave'), t('keepPlaying'));
+    if (!leave) return;
+    S.cup = null;
+  }
+  go(home);
+});
+soundBtn.addEventListener('click', () => { S.sound = !S.sound; store.set('sound', S.sound); paintSound(); Sound.tap(); });
+langBtn.addEventListener('click', () => { S.lang = S.lang === 'ar' ? 'en' : 'ar'; store.set('lang', S.lang); applyLang(); Sound.tap(); go(home); });
+document.addEventListener('pointerdown', () => Sound.unlock(), { once: true });
+
+const avatarHtml = (p, cls = '') => `<span class="avatar ${cls}" data-tier="${p.tier}" aria-hidden="true">${p.avatar}</span>`;
+const tierTag = id => `<span class="tier-tag" data-tier="${id}">${tier(id).name}</span>`;
+const gameTile = id => { const g = game(id); return `<span class="gicon">${g.icon}</span><span><b>${g.name}</b><span>${g.how}</span></span>`; };
+
+/* ---------- install hints ---------- */
+let installEvt = null;
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); installEvt = e; const b = $('#installBtn'); if (b) b.hidden = false; });
+const standalone = () => window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+const inFrame = (() => { try { return window.self !== window.top; } catch { return true; } })();
+const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+/* ================= HOME ================= */
+const TROPHY = `<svg viewBox="0 0 120 120" aria-hidden="true">
+  <path d="M34 26H20c0 20 9 31 24 33M86 26h14c0 20-9 31-24 33" fill="none" stroke="#FFC83D" stroke-width="7" stroke-linecap="round"/>
+  <path d="M33 18h54v12c0 22-12 37-27 37S33 52 33 30z" fill="#FFC83D"/>
+  <path d="M60 28l4.2 8.6 9.4 1.4-6.8 6.6 1.6 9.4L60 49.6 51.6 54l1.6-9.4-6.8-6.6 9.4-1.4z" fill="#FFF6E6"/>
+  <rect x="54" y="66" width="12" height="16" fill="#FFC83D"/>
+  <rect x="40" y="80" width="40" height="10" rx="3" fill="#FFC83D"/>
+  <rect x="33" y="89" width="54" height="11" rx="4" fill="#FF6A5C"/>
+</svg>`;
+
+function home() {
+  setTitle('');
+  const ps = S.players;
+  const showIOSTip = isIOS && !standalone() && !inFrame;
+  app.innerHTML = `
+    <section class="hero">
+      ${TROPHY}
+      <div>
+        <h1>${t('appName')}</h1>
+        <p>${t('tagline')}</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><h2 style="font-size:26px">${t('players')}</h2><span class="muted">${ps.length ? t('playerCount', ps.length) : t('addEveryone')}</span></div>
+      <div class="players">
+        ${ps.map(p => `<button class="pcard" data-edit="${p.id}" data-tier="${p.tier}">${avatarHtml(p)}<span class="who"><span class="name" dir="auto">${esc(p.name)}</span>${tierTag(p.tier)}</span></button>`).join('')}
+        <button class="pcard add-card" id="addPlayer">${t('addPlayerCard')}</button>
+      </div>
+    </section>
+
+    <div class="section">
+      <button class="btn primary big wide" id="startCup" ${ps.length ? '' : 'disabled'}>${t('startCup')}</button>
+      <div class="row">
+        <button class="btn" id="practice" ${ps.length ? '' : 'disabled'}>${t('practice')}</button>
+        <button class="btn" id="fame">${t('fame')}</button>
+      </div>
+      <button class="btn ghost" id="installBtn" ${installEvt ? '' : 'hidden'}>${t('install')}</button>
+      ${showIOSTip ? `<div class="install-tip">${t('iosTip')}</div>` : ''}
+    </div>
+
+    <section class="section">
+      <span class="eyebrow">${t('threeLevels')}</span>
+      <div class="levels">
+        ${TIER_IDS.map(id => { const v = tier(id); return `<div class="level" data-tier="${id}"><h3>${v.name}</h3><span class="ages">${v.ages}</span><p>${v.blurb}</p></div>`; }).join('')}
+      </div>
+    </section>
+
+    <section class="section">
+      <span class="eyebrow">${t('fiveGames')}</span>
+      <div class="games">${GAME_IDS.map(id => `<div class="gtile" data-game="${id}">${gameTile(id)}</div>`).join('')}</div>
+    </section>`;
+
+  $('#addPlayer').onclick = () => go(playerForm);
+  $$('[data-edit]').forEach(b => b.onclick = () => go(playerForm, b.dataset.edit));
+  $('#startCup').onclick = () => go(cupSetup);
+  $('#practice').onclick = () => go(practiceSetup);
+  $('#fame').onclick = () => go(hallOfFame);
+  $('#installBtn').onclick = async () => { if (!installEvt) return; installEvt.prompt(); await installEvt.userChoice.catch(() => {}); installEvt = null; $('#installBtn').hidden = true; };
+}
+
+/* ================= PLAYER FORM ================= */
+function playerForm(id) {
+  const existing = id ? byId(id) : null;
+  const used = new Set(S.players.map(p => p.avatar));
+  const draft = existing ? { ...existing } : { id: uid(), name: '', age: '', tier: 'explorer', avatar: AVATARS.find(a => !used.has(a)) || AVATARS[0], stats: { cups: 0, played: 0, best: {} } };
+  let tierTouched = !!existing;
+  setTitle(existing ? t('editPlayer') : t('newPlayer'));
+
+  app.innerHTML = `
+    <form class="section" id="pf" autocomplete="off">
+      <div class="form-grid">
+        <div class="field"><label for="pname">${t('name')}</label><input class="input" id="pname" maxlength="14" dir="auto" placeholder="${esc(t('namePh'))}" value="${esc(draft.name)}" required></div>
+        <div class="field"><label for="page">${t('age')}</label><input class="input" id="page" type="number" inputmode="numeric" min="3" max="120" placeholder="11" value="${esc(draft.age)}"></div>
+      </div>
+      <div class="field"><label>${t('level')}</label>
+        <div class="seg" id="tierSeg">${TIER_IDS.map(tid => `<button type="button" data-tier="${tid}" aria-pressed="${tid === draft.tier}"><b>${tier(tid).name}</b><small>${tier(tid).ages}</small></button>`).join('')}</div>
+      </div>
+      <div class="field"><label>${t('pickAnimal')}</label>
+        <div class="avatars" id="avs">${AVATARS.map(a => `<button type="button" aria-pressed="${a === draft.avatar}" aria-label="${a}">${a}</button>`).join('')}</div>
+      </div>
+      <div class="row">
+        ${existing ? `<button type="button" class="btn ghost" id="del">${t('remove')}</button>` : ''}
+        <button type="submit" class="btn primary">${existing ? t('save') : t('addPlayer')}</button>
+      </div>
+    </form>`;
+
+  const paintTier = () => $$('#tierSeg button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.tier === draft.tier)));
+  $('#page').addEventListener('input', e => {
+    const a = parseInt(e.target.value, 10);
+    if (!tierTouched && a > 0) { draft.tier = tierForAge(a); paintTier(); }
+  });
+  $$('#tierSeg button').forEach(b => b.onclick = () => { draft.tier = b.dataset.tier; tierTouched = true; paintTier(); Sound.tap(); });
+  $$('#avs button').forEach(b => b.onclick = () => { draft.avatar = b.textContent; $$('#avs button').forEach(x => x.setAttribute('aria-pressed', String(x === b))); Sound.tap(); });
+  if (existing) $('#del').onclick = async () => {
+    if (await ask(t('removeQ', existing.name), t('remove'), t('cancel'))) {
+      S.players = S.players.filter(p => p.id !== existing.id); savePlayers(); go(home);
+    }
+  };
+  $('#pf').addEventListener('submit', e => {
+    e.preventDefault();
+    draft.name = $('#pname').value.trim().slice(0, 14);
+    if (!draft.name) { $('#pname').focus(); return; }
+    const a = parseInt($('#page').value, 10);
+    draft.age = a > 0 ? a : '';
+    if (existing) Object.assign(existing, draft); else S.players.push(draft);
+    savePlayers(); Sound.good(); go(home);
+  });
+  if (!existing) $('#pname').focus();
+}
+
+/* ================= CUP ================= */
+function cupSetup() {
+  setTitle(t('newCup'));
+  const chosen = new Set(S.players.map(p => p.id));
+  const games = new Set(GAME_IDS);
+  let rounds = 5;
+  app.innerHTML = `
+    <section class="section"><span class="eyebrow">${t('whoPlaying')}</span>
+      <div class="pick-players" id="pp">${S.players.map(p => `<button data-id="${p.id}" data-tier="${p.tier}" aria-pressed="true">${avatarHtml(p)}<span dir="auto">${esc(p.name)}</span></button>`).join('')}</div>
+    </section>
+    <section class="section"><span class="eyebrow">${t('rounds')}</span>
+      <div class="seg numbers" id="rs">${[3, 5, 7].map((n, i) => `<button data-n="${n}" aria-pressed="${n === rounds}"><b>${n}</b><small>${t('roundTime')[i]}</small></button>`).join('')}</div>
+    </section>
+    <section class="section"><span class="eyebrow">${t('gamesInCup')}</span>
+      <div class="games" id="gs">${GAME_IDS.map(id => `<button class="gtile selectable" data-game="${id}" aria-pressed="true">${gameTile(id)}</button>`).join('')}</div>
+    </section>
+    <button class="btn primary big wide" id="go">${t('startTheCup')}</button>`;
+
+  const refresh = () => { $('#go').disabled = !chosen.size || !games.size; };
+  $$('#pp button').forEach(b => b.onclick = () => { const id = b.dataset.id; chosen.has(id) ? chosen.delete(id) : chosen.add(id); b.setAttribute('aria-pressed', String(chosen.has(id))); Sound.tap(); refresh(); });
+  $$('#rs button').forEach(b => b.onclick = () => { rounds = +b.dataset.n; $$('#rs button').forEach(x => x.setAttribute('aria-pressed', String(x === b))); Sound.tap(); });
+  $$('#gs button').forEach(b => b.onclick = () => { const id = b.dataset.game; games.has(id) ? games.delete(id) : games.add(id); b.setAttribute('aria-pressed', String(games.has(id))); Sound.tap(); refresh(); });
+  $('#go').onclick = () => {
+    const ids = S.players.filter(p => chosen.has(p.id)).map(p => p.id);
+    const order = []; let pool = [];
+    for (let r = 0; r < rounds; r++) { if (!pool.length) pool = shuffle([...games]); order.push(pool.pop()); }
+    S.cup = { ids, order, round: 0, turn: 0, scores: Object.fromEntries(ids.map(i => [i, 0])), roundPts: {} };
+    go(roundIntro);
+  };
+}
+
+const turnOrder = () => { const c = S.cup, n = c.ids.length, k = c.round % n; return [...c.ids.slice(k), ...c.ids.slice(0, k)]; };
+
+function roundIntro() {
+  const c = S.cup, gid = c.order[c.round], g = game(gid);
+  setTitle(t('roundOf', c.round + 1, c.order.length));
+  c.turn = 0; c.roundPts = {};
+  app.innerHTML = `<div class="center" data-game="${gid}">
+    <span class="eyebrow">${t('round', c.round + 1)}</span>
+    <div class="big-icon">${g.icon}</div>
+    <h2>${g.name}</h2>
+    <p>${g.how} ${t('ownLevel')}</p>
+    <div class="lineup">${turnOrder().map(id => { const p = byId(id); return `<span class="pill">${avatarHtml(p)}<span dir="auto">${esc(p.name)}</span></span>`; }).join('')}</div>
+    <button class="btn primary big" id="go">${t('letsGo')}</button></div>`;
+  $('#go').onclick = () => go(handoff);
+}
+
+function handoff() {
+  const c = S.cup, p = byId(turnOrder()[c.turn]);
+  setTitle(t('roundOf', c.round + 1, c.order.length));
+  app.innerHTML = `<div class="center">
+    <span class="eyebrow">${c.ids.length > 1 ? t('passTo') : t('yourTurn')}</span>
+    ${avatarHtml(p, 'xl')}
+    <h2 dir="auto">${esc(p.name)}</h2>
+    ${tierTag(p.tier)}
+    <button class="btn primary big" id="go">${t('ready')}</button></div>`;
+  $('#go').onclick = () => go(playGame, c.order[c.round], p, (score, detail) => {
+    c.scores[p.id] += score;
+    c.roundPts[p.id] = score;
+    go(turnResult, p, score, detail);
+  });
+}
+
+function turnResult(p, score, detail) {
+  const c = S.cup, order = turnOrder();
+  const nextP = c.turn + 1 < order.length ? byId(order[c.turn + 1]) : null;
+  app.innerHTML = `<div class="center">
+    <span class="eyebrow" dir="auto">${esc(t('scored', p.name))}</span>
+    <div class="points" dir="ltr">+${score}</div>
+    <ul class="detail">${detail.map(d => `<li>${esc(d)}</li>`).join('')}</ul>
+    <p>${t('cupTotal')} <b style="color:var(--ink)">${c.scores[p.id]}</b></p>
+    <button class="btn primary big" id="go">${nextP ? esc(t('nextP', nextP.name)) : t('seeScores')}</button></div>`;
+  $('#go').onclick = () => {
+    if (nextP) { c.turn++; go(handoff); }
+    else go(roundScores);
+  };
+}
+
+const ranked = () => S.cup.ids.map(byId).sort((a, b) => S.cup.scores[b.id] - S.cup.scores[a.id]);
+
+function roundScores() {
+  const c = S.cup, last = c.round + 1 >= c.order.length;
+  const list = ranked(), top = Math.max(1, ...list.map(p => c.scores[p.id]));
+  setTitle(t('afterRound', c.round + 1, c.order.length));
+  app.innerHTML = `<div class="center">
+    <h2>${t('scoreboard')}</h2>
+    <div class="standings">${list.map((p, i) => `<div class="stand" data-tier="${p.tier}">
+      <span class="rank">${i + 1}</span>${avatarHtml(p)}
+      <span class="bar-wrap"><span class="nm" dir="auto">${esc(p.name)}</span><span class="track"><i style="width:${(c.scores[p.id] / top) * 100}%"></i></span></span>
+      <span class="sc">${c.scores[p.id]}<small dir="ltr">+${c.roundPts[p.id] || 0}</small></span></div>`).join('')}</div>
+    <button class="btn primary big" id="go">${last ? t('crown') : t('nextRound', c.round + 2, game(c.order[c.round + 1]).name)}</button></div>`;
+  $('#go').onclick = () => {
+    if (last) go(finale);
+    else { c.round++; go(roundIntro); }
+  };
+}
+
+function finale() {
+  const c = S.cup, list = ranked();
+  const best = c.scores[list[0].id];
+  const winners = list.filter(p => c.scores[p.id] === best);
+  const rankOf = p => 1 + list.filter(q => c.scores[q.id] > c.scores[p.id]).length;
+  list.forEach(p => { p.stats.played++; });
+  winners.forEach(p => { p.stats.cups++; });
+  savePlayers();
+  setTitle(t('cupFinished'));
+  const podium = [list[1], list[0], list[2]].map((p, i) => p ? `<div class="step p${[2, 1, 3][i]}" data-tier="${p.tier}">
+      ${avatarHtml(p)}<span class="nm" dir="auto">${esc(p.name)}</span><span class="sc">${c.scores[p.id]}</span>
+      <span class="block">${rankOf(p)}</span></div>` : '').join('');
+  const names = winners.map(p => esc(p.name)).join(t('and'));
+  app.innerHTML = `<div class="center">
+    <span class="eyebrow">${winners.length > 1 ? t('shared') : t('goesTo')}</span>
+    <h2 dir="auto" style="color:var(--sun)">${names}</h2>
+    <div class="podium">${podium}</div>
+    ${list.length > 3 ? `<p>${list.slice(3).map(p => `${esc(p.name)} ${c.scores[p.id]}`).join(' · ')}</p>` : ''}
+    <div class="row" style="width:100%;max-width:520px">
+      <button class="btn" id="home2">${t('home')}</button>
+      <button class="btn primary" id="again">${t('playAgain')}</button>
+    </div></div>`;
+  S.cup = null;
+  Sound.win(); confetti();
+  $('#home2').onclick = () => go(home);
+  $('#again').onclick = () => go(cupSetup);
+}
+
+/* ================= PRACTICE ================= */
+function practiceSetup(preId) {
+  setTitle(t('practice'));
+  let who = preId || S.players[0].id;
+  app.innerHTML = `
+    <section class="section"><span class="eyebrow">${t('whoPractising')}</span>
+      <div class="pick-players" id="pp">${S.players.map(p => `<button data-id="${p.id}" data-tier="${p.tier}" aria-pressed="${p.id === who}">${avatarHtml(p)}<span dir="auto">${esc(p.name)}</span></button>`).join('')}</div>
+    </section>
+    <section class="section"><span class="eyebrow">${t('pickGame')}</span>
+      <div class="games">${GAME_IDS.map(id => `<button class="gtile" data-game="${id}">${gameTile(id)}</button>`).join('')}</div>
+    </section>`;
+  $$('#pp button').forEach(b => b.onclick = () => { who = b.dataset.id; $$('#pp button').forEach(x => x.setAttribute('aria-pressed', String(x === b))); Sound.tap(); });
+  $$('.games button').forEach(b => b.onclick = () => practiceRun(b.dataset.game, who));
+}
+
+function practiceRun(gid, who) {
+  const p = byId(who);
+  const prev = p.stats.best[gid] || 0;
+  go(playGame, gid, p, (score, detail) => go(() => {
+    setTitle(t('practice'));
+    app.innerHTML = `<div class="center">
+      <span class="eyebrow">${game(gid).name}</span>
+      <div class="points">${score}</div>
+      <ul class="detail">${detail.map(d => `<li>${esc(d)}</li>`).join('')}</ul>
+      <p>${score > prev ? (prev ? t('newBest', prev) : t('firstScore')) : t('bestWas', prev)}</p>
+      <div class="row" style="width:100%;max-width:520px">
+        <button class="btn" id="other">${t('otherGames')}</button>
+        <button class="btn primary" id="again">${t('playAgain')}</button>
+      </div></div>`;
+    if (score > prev) { Sound.win(); confetti(); }
+    $('#other').onclick = () => go(practiceSetup, who);
+    $('#again').onclick = () => practiceRun(gid, who);
+  }));
+}
+
+/* ================= HALL OF FAME ================= */
+function hallOfFame() {
+  setTitle(t('fame'));
+  const list = [...S.players].sort((a, b) => b.stats.cups - a.stats.cups || b.stats.played - a.stats.played);
+  app.innerHTML = `<section class="section">
+    <h2 style="font-size:34px">${t('fame')}</h2>
+    ${list.length ? `<div class="table-wrap"><table class="fame">
+      <thead><tr><th>${t('thPlayer')}</th><th>${t('thCups')}</th><th>${t('thPlayed')}</th>${GAME_IDS.map(id => `<th title="${esc(t('thBest', game(id).name))}">${GAME_ICONS[id]}</th>`).join('')}</tr></thead>
+      <tbody>${list.map(p => `<tr><td><span class="who" data-tier="${p.tier}">${avatarHtml(p)}<span dir="auto">${esc(p.name)}</span></span></td>
+        <td style="color:var(--sun);font-family:var(--f-display);font-size:22px">${p.stats.cups}</td><td>${p.stats.played}</td>
+        ${GAME_IDS.map(id => `<td>${p.stats.best[id] ?? '–'}</td>`).join('')}</tr>`).join('')}</tbody></table></div>
+      <p class="muted" style="margin:0">${t('fameNote')}</p>`
+    : `<p class="muted">${t('noPlayers')}</p>`}
+  </section>`;
+}
+
+/* ================= GAME RUNNER ================= */
+function makeTimer(fill) {
+  let raf = null, t0 = 0, limit = 1, onEnd = null, lastTick = null;
+  const frame = now => {
+    const left = Math.max(0, limit - (now - t0) / 1000);
+    fill.style.transform = `scaleX(${left / limit})`;
+    fill.classList.toggle('low', left < limit * .25);
+    const s = Math.ceil(left);
+    if (left <= 3 && left > 0 && s !== lastTick) { lastTick = s; Sound.tick(); }
+    if (left <= 0) { raf = null; onEnd && onEnd(); return; }
+    raf = requestAnimationFrame(frame);
+  };
+  return {
+    start(sec, cb) { this.stop(); limit = sec; onEnd = cb; t0 = performance.now(); lastTick = null; raf = requestAnimationFrame(frame); },
+    stop() { if (raf) cancelAnimationFrame(raf); raf = null; },
+    frac() { return raf ? Math.max(0, limit - (performance.now() - t0) / 1000) / limit : 0; },
+  };
+}
+
+function playGame(gid, player, done) {
+  S.inPlay = true;
+  setTitle(game(gid).name);
+  app.innerHTML = `<div class="play">
+    <div class="play-head">${avatarHtml(player)}<div class="who"><div class="name" dir="auto">${esc(player.name)}</div>${tierTag(player.tier)}</div><div class="live" id="live">0</div></div>
+    <div class="timer"><i id="tfill"></i></div>
+    <div class="stage" id="stage"></div></div>`;
+  const timers = new Set();
+  const live = $('#live');
+  let finished = false;
+  const ctx = {
+    tier: player.tier,
+    stage: $('#stage'),
+    score: 0,
+    timer: makeTimer($('#tfill')),
+    add(n) {
+      ctx.score = Math.max(0, ctx.score + n);
+      live.textContent = Math.round(ctx.score);
+      live.classList.remove('pop'); void live.offsetWidth; live.classList.add('pop');
+    },
+    later(fn, ms) { const h = setTimeout(() => { timers.delete(h); fn(); }, ms); timers.add(h); },
+    done(detail) {
+      if (finished) return; finished = true;
+      const score = Math.min(100, Math.round(ctx.score));
+      const best = player.stats.best;
+      if (score > (best[gid] || 0)) { best[gid] = score; savePlayers(); }
+      S.inPlay = false;
+      ctx.later(() => done(score, detail), 500);
+    },
+  };
+  S.cleanup = () => { ctx.timer.stop(); timers.forEach(clearTimeout); timers.clear(); finished = true; };
+  RUN[gid](ctx);
+}
+
+/* Multiple-choice runner shared by Number Sprint and What Comes Next */
+function quiz(ctx, make, time, count = 5) {
+  let i = 0, right = 0;
+  const next = () => {
+    if (i >= count) return ctx.done([t('correct', right, count)]);
+    const q = make(ctx.tier); i++;
+    ctx.stage.innerHTML = `<div class="q-count">${t('question', i, count)}</div>${q.prompt}
+      <div class="choices">${q.choices.map((c, k) => `<button class="choice" data-k="${k}">${c}</button>`).join('')}</div>`;
+    const btns = $$('.choice', ctx.stage);
+    let locked = false;
+    const answer = k => {
+      if (locked) return; locked = true;
+      const f = ctx.timer.frac(); ctx.timer.stop();
+      const ok = k !== null && q.choices[k] === q.answer;
+      btns.forEach((b, j) => { b.disabled = true; if (q.choices[j] === q.answer) b.classList.add('right'); else if (j === k) b.classList.add('wrong'); });
+      if (ok) { right++; ctx.add(10 + Math.round(10 * f)); Sound.good(); }
+      else { Sound.bad(); buzz(80); }
+      ctx.later(next, ok ? 700 : 1400);
+    };
+    btns.forEach((b, k) => b.onclick = () => answer(k));
+    ctx.timer.start(time, () => answer(null));
+  };
+  next();
+}
+
+/* Four distinct numeric choices around the answer */
+function numChoices(ans, spread, extra = [], min = 0) {
+  const set = new Set([ans]);
+  extra.forEach(v => { if (v >= min && set.size < 4) set.add(v); });
+  let guard = 0;
+  while (set.size < 4 && guard++ < 200) {
+    const v = ans + pick(spread) * (Math.random() < .5 ? -1 : 1);
+    if (v >= min) set.add(v);
+  }
+  for (let d = 1; set.size < 4; d++) set.add(ans + d);
+  return { choices: shuffle([...set]).map(String), answer: String(ans) };
+}
+
+const THINGS = ['🍎', '🍓', '🐞', '⭐', '🎈', '🐟', '🌼', '🍪', '🐥', '🚗'];
+
+/* ---------- Number Sprint ---------- */
+const MATH = {
+  star: [
+    () => { const n = rand(3, 9), e = pick(THINGS); return { prompt: `<div class="q-label">${t('howMany')}</div><div class="count-row">${`<span>${e}</span>`.repeat(n)}</div>`, ...numChoices(n, [1, 2], [], 1) }; },
+    () => { const a = rand(1, 6), b = rand(1, 10 - a), e = pick(THINGS); return { prompt: `<div class="q-big">${a} + ${b}</div><div class="q-help">${e.repeat(a)} + ${e.repeat(b)}</div>`, ...numChoices(a + b, [1, 2], [], 0) }; },
+    () => { const a = rand(3, 10), b = rand(1, a - 1), e = pick(THINGS); return { prompt: `<div class="q-big">${a} − ${b}</div><div class="q-help">${e.repeat(a - b)}<s>${e.repeat(b)}</s></div>`, ...numChoices(a - b, [1, 2], [], 0) }; },
+    () => { const s = new Set(); while (s.size < 4) s.add(rand(1, 20)); const arr = shuffle([...s]); return { prompt: `<div class="q-label">${t('biggest')}</div>`, choices: arr.map(String), answer: String(Math.max(...arr)) }; },
+  ],
+  explorer: [
+    () => { const a = rand(3, 12), b = rand(3, 12); return { prompt: `<div class="q-big">${a} × ${b}</div>`, ...numChoices(a * b, [a, b, 1, 2]) }; },
+    () => { const b = rand(2, 12), q = rand(2, 12); return { prompt: `<div class="q-big">${b * q} ÷ ${b}</div>`, ...numChoices(q, [1, 2, 3], [], 1) }; },
+    () => { const a = rand(25, 99), b = rand(12, 99); return { prompt: `<div class="q-big">${a} + ${b}</div>`, ...numChoices(a + b, [1, 10, 9, 11]) }; },
+    () => { const a = rand(60, 160), b = rand(12, a - 20); return { prompt: `<div class="q-big">${a} − ${b}</div>`, ...numChoices(a - b, [1, 10, 9, 11]) }; },
+    () => { const a = rand(3, 9), b = rand(3, 12); return { prompt: `<div class="q-big">${a} × ${t('ask')} = ${a * b}</div>`, ...numChoices(b, [1, 2, 3], [], 1) }; },
+  ],
+  master: [
+    () => { const a = rand(12, 29), b = rand(12, 19); return { prompt: `<div class="q-big">${a} × ${b}</div>`, ...numChoices(a * b, [10, 20, a, b, 2]) }; },
+    () => { const p = pick([15, 20, 25, 30, 40, 60, 75]), n = rand(2, 12) * 20; return { prompt: `<div class="q-big">${t('pctOf', p, n)}</div>`, ...numChoices(p * n / 100, [5, 10, 15, 2]) }; },
+    () => { const n = rand(11, 25); return { prompt: `<div class="q-big">${n}²</div>`, ...numChoices(n * n, [n, 2 * n, 10, 1], [n * 2]) }; },
+    () => { const a = rand(2, 20), b = rand(2, 9), c = rand(2, 9); return { prompt: `<div class="q-big">${a} + ${b} × ${c}</div>`, ...numChoices(a + b * c, [b, c, 10, 1], [(a + b) * c]) }; },
+    () => { const d = pick([3, 4, 5, 6, 8]), m = rand(1, d - 1), x = d * rand(3, 12); return { prompt: `<div class="q-big">${t('fracOf', m, d, x)}</div>`, ...numChoices(m * x / d, [x / d, 1, 2, 5], [], 1) }; },
+  ],
+};
+
+/* ---------- What Comes Next? ---------- */
+const seqHtml = items => `<div class="q-label">${t('whatNext')}</div><div class="seq">${items.map(x => `<span>${x}</span>`).join('')}<span class="ask">${t('ask')}</span></div>`;
+const PATTERN_EMOJI = ['🔴', '🔵', '🟡', '🟢', '🟣', '🟠', '⭐', '🌙', '🍎', '🐟', '🐸', '🎈'];
+const ALPHABET = {
+  en: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split(''),
+  ar: 'أ ب ت ث ج ح خ د ذ ر ز س ش ص ض ط ظ ع غ ف ق ك ل م ن ه و ي'.split(' '),
+};
+const seqNum = (items, ans, spread, extra = [], min = 0) => ({ prompt: seqHtml(items), ...numChoices(ans, spread, extra, min) });
+const PATTERN = {
+  star: [
+    () => {
+      const unit = pick(['AB', 'AB', 'ABB', 'AAB', 'ABC']);
+      const pool = shuffle(PATTERN_EMOJI), map = { A: pool[0], B: pool[1], C: pool[2] };
+      const len = unit.length === 2 ? 5 : unit.length + 3 + rand(0, 1);
+      const full = Array.from({ length: len + 1 }, (_, i) => map[unit[i % unit.length]]);
+      const ans = full.pop();
+      const others = [...new Set([map.A, map.B, map.C, pool[3], pool[4]])].filter(x => x !== ans);
+      const choices = shuffle([ans, ...others.slice(0, 3)]);
+      return { prompt: seqHtml(full), choices, answer: ans };
+    },
+    () => { const s = rand(1, 5), st = pick([1, 2]); const xs = [0, 1, 2, 3].map(i => s + i * st); return seqNum(xs, s + 4 * st, [1, 2], [], 1); },
+    () => { const s = rand(6, 10); const xs = [0, 1, 2, 3].map(i => s - i); return seqNum(xs, s - 4, [1, 2], [], 0); },
+  ],
+  explorer: [
+    () => { const s = rand(1, 20), k = rand(3, 9); const xs = [0, 1, 2, 3].map(i => s + i * k); return seqNum(xs, s + 4 * k, [1, 2, k]); },
+    () => { const s = rand(60, 95), k = rand(3, 9); const xs = [0, 1, 2, 3].map(i => s - i * k); return seqNum(xs, s - 4 * k, [1, 2, k]); },
+    () => { const s = rand(1, 5), m = pick([2, 2, 3]); const xs = [0, 1, 2, 3].map(i => s * m ** i); return seqNum(xs, s * m ** 4, [s * m ** 3, 2, 10], [s * m ** 3 + (s * m ** 3 - s * m ** 2)], 1); },
+    () => { const n = rand(1, 5); const xs = [0, 1, 2, 3].map(i => (n + i) ** 2); return seqNum(xs, (n + 4) ** 2, [1, 2, 4], [xs[3] + (xs[3] - xs[2])], 1); },
+    () => { const s = rand(5, 20), a = rand(4, 9), b = rand(1, 3); const xs = [s]; for (let i = 0; i < 5; i++) xs.push(xs[i] + (i % 2 ? -b : a)); const ans = xs.pop(); return seqNum(xs, ans, [1, a, b, a - b]); },
+  ],
+  master: [
+    () => { const a = rand(1, 5), b = rand(a, a + 4); const xs = [a, b]; while (xs.length < 6) xs.push(xs[xs.length - 1] + xs[xs.length - 2]); const ans = xs.pop(); return seqNum(xs, ans, [1, 2, xs[3], 5]); },
+    () => { const s = rand(1, 10), d = rand(1, 4); const xs = [s]; for (let i = 0; i < 4; i++) xs.push(xs[i] + d + i); const ans = xs.pop(); return seqNum(xs, ans, [1, 2, 3], [xs[3] + (xs[3] - xs[2])]); },
+    () => { const P = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47]; const k = rand(1, 8); const xs = P.slice(k, k + 5); return seqNum(xs, P[k + 5], [1, 2, 3, 4], [], 1); },
+    () => { const s = rand(1, 4); const xs = [s]; for (let i = 0; i < 5; i++) xs.push(xs[i] * 2 + 1); const ans = xs.pop(); return seqNum(xs, ans, [1, 2, 3], [xs[4] * 2], 1); },
+    () => { const n = rand(1, 3); const xs = [0, 1, 2, 3].map(i => (n + i) ** 3); return seqNum(xs, (n + 4) ** 3, [1, 10, 25], [(n + 4) ** 2 * 2], 1); },
+    () => {
+      const A = ALPHABET[S.lang], s = rand(0, 5), idx = [s];
+      for (let i = 0; i < 4; i++) idx.push(idx[i] + i + 1);
+      const ans = idx.pop(), set = new Set([ans]);
+      while (set.size < 4) { const v = ans + pick([-2, -1, 1, 2, 3]); if (v >= 0 && v < A.length) set.add(v); }
+      return { prompt: seqHtml(idx.map(i => A[i])), choices: shuffle([...set]).map(i => A[i]), answer: A[ans] };
+    },
+  ],
+};
+
+/* ---------- Word Builder ---------- */
+const WORDS = {
+  en: {
+    star: [['CAT', '🐱'], ['DOG', '🐶'], ['SUN', '☀️'], ['BUS', '🚌'], ['PIG', '🐷'], ['HAT', '🎩'], ['BEE', '🐝'], ['FOX', '🦊'], ['COW', '🐮'], ['EGG', '🥚'], ['KEY', '🔑'], ['CAR', '🚗'], ['OWL', '🦉'], ['ANT', '🐜'], ['FISH', '🐟'], ['FROG', '🐸'], ['DUCK', '🦆'], ['CAKE', '🎂'], ['STAR', '⭐'], ['MOON', '🌙'], ['BALL', '⚽'], ['TREE', '🌳'], ['BOOK', '📖'], ['BEAR', '🐻'], ['LION', '🦁'], ['SHIP', '🚢']],
+    explorer: [['PLANET', 'We live on one called Earth'], ['ROCKET', 'It blasts off into space'], ['CASTLE', 'A king and queen live here'], ['PIRATE', 'Sails the seas hunting for treasure'], ['GUITAR', 'An instrument with six strings'], ['JUNGLE', 'A thick, wild forest full of animals'], ['DRAGON', 'A legendary beast that breathes fire'], ['TURTLE', 'Carries its house on its back'], ['PENCIL', 'You write with it and can rub it out'], ['ISLAND', 'Land with water all around it'], ['WIZARD', 'Casts spells with a wand'], ['SPIDER', 'Has eight legs and spins webs'], ['DOLPHIN', 'A clever sea mammal that clicks and whistles'], ['PYRAMID', 'Ancient Egyptian tomb with a pointed top'], ['GALAXY', 'A huge family of stars, like the Milky Way'], ['PUZZLE', 'Pieces that fit together'], ['CAMERA', 'Takes photos'], ['MONKEY', 'Swings through trees and loves bananas'], ['VOLCANO', 'A mountain that can erupt with lava'], ['DESERT', 'A hot, dry, sandy place'], ['CAMEL', 'Crosses the desert with a hump on its back'], ['FALCON', 'A fast hunting bird']],
+    master: [['TELESCOPE', 'Instrument for viewing distant stars'], ['LABYRINTH', 'A maze, home of the Minotaur in Greek myth'], ['ORCHESTRA', 'Large group of musicians led by a conductor'], ['CROCODILE', 'River reptile with one of the strongest bites'], ['ALGORITHM', 'Step-by-step rules a computer follows'], ['HURRICANE', 'Powerful tropical storm with violent winds'], ['ARCHITECT', 'Person who designs buildings'], ['CHAMELEON', 'Lizard that changes colour'], ['PARACHUTE', 'Slows your fall from an aircraft'], ['MARATHON', 'A 42.195 km foot race'], ['ASTRONAUT', 'Trained to travel into space'], ['SATELLITE', 'Object that orbits a planet'], ['DICTIONARY', 'Book of words and their meanings'], ['EQUATOR', 'Imaginary line around the middle of the Earth'], ['CHOCOLATE', 'Sweet treat made from cacao beans'], ['KANGAROO', 'Carries its baby in a pouch'], ['MICROSCOPE', 'Makes tiny things look big'], ['VOCABULARY', 'All the words a person knows']],
+  },
+  ar: {
+    star: [['قطة', '🐱'], ['كلب', '🐶'], ['شمس', '☀️'], ['بيت', '🏠'], ['سمك', '🐟'], ['أسد', '🦁'], ['قمر', '🌙'], ['كرة', '⚽'], ['بطة', '🦆'], ['فيل', '🐘'], ['موز', '🍌'], ['جمل', '🐪'], ['باب', '🚪'], ['ثلج', '❄️'], ['قلب', '❤️'], ['عنب', '🍇'], ['بيض', '🥚'], ['نجمة', '⭐'], ['وردة', '🌹'], ['نحلة', '🐝'], ['شجرة', '🌳'], ['كتاب', '📖'], ['تفاح', '🍎'], ['خروف', '🐑']],
+    explorer: [['كوكب', 'نعيش على واحد منها اسمه الأرض'], ['صاروخ', 'ينطلق بسرعة كبيرة إلى الفضاء'], ['قلعة', 'بناء قديم محصّن يعيش فيه الملوك'], ['قرصان', 'يبحر في البحار بحثًا عن الكنز'], ['غيتار', 'آلة موسيقية لها ستة أوتار'], ['غابة', 'أشجار كثيفة مليئة بالحيوانات'], ['تنين', 'مخلوق أسطوري ينفث النار'], ['سلحفاة', 'تحمل بيتها على ظهرها'], ['مسطرة', 'أداة لرسم الخطوط المستقيمة'], ['جزيرة', 'أرض يحيط بها الماء من كل جانب'], ['ساحر', 'يلقي التعاويذ بعصا سحرية'], ['عنكبوت', 'له ثمانية أرجل وينسج الخيوط'], ['دلفين', 'حيوان بحري ذكي يصفّر ويلعب'], ['هرم', 'بناء مصري قديم رأسه مدبب'], ['مجرة', 'عائلة ضخمة من النجوم مثل درب التبانة'], ['كاميرا', 'تلتقط الصور'], ['قرد', 'يتسلق الأشجار ويحب الموز'], ['بركان', 'جبل يقذف الحمم'], ['صحراء', 'مكان حار وجاف مليء بالرمال'], ['صقر', 'طائر جارح سريع'], ['نخلة', 'شجرة تعطينا التمر'], ['فراشة', 'حشرة جميلة بأجنحة ملونة'], ['مظلة', 'تحمينا من المطر والشمس']],
+    master: [['تلسكوب', 'أداة لرؤية النجوم البعيدة'], ['أوركسترا', 'فرقة موسيقية كبيرة يقودها مايسترو'], ['تمساح', 'زاحف نهري من أقوى الحيوانات عضّة'], ['خوارزمية', 'خطوات منظمة يتبعها الحاسوب لحل مشكلة'], ['إعصار', 'عاصفة استوائية برياح عنيفة'], ['حرباء', 'سحلية تغيّر لونها'], ['ماراثون', 'سباق جري طوله 42.195 كم'], ['قاموس', 'كتاب يشرح معاني الكلمات'], ['شوكولاتة', 'حلوى تُصنع من حبوب الكاكاو'], ['كنغر', 'يحمل صغيره في جيب على بطنه'], ['مجهر', 'يجعل الأشياء الصغيرة تبدو كبيرة'], ['ديناصور', 'زاحف عملاق انقرض منذ ملايين السنين'], ['أخطبوط', 'حيوان بحري له ثمانية أذرع'], ['مغناطيس', 'يجذب الحديد إليه'], ['بانوراما', 'منظر واسع من جميع الجهات'], ['مستشفى', 'مكان لعلاج المرضى'], ['موسوعة', 'مجموعة كتب تجمع معلومات عن كل شيء'], ['متحف', 'مكان لعرض الآثار والتحف']],
+  },
+};
+
+function wordGame(ctx) {
+  const tierId = ctx.tier, time = { star: 50, explorer: 45, master: 50 }[tierId];
+  const words = shuffle(WORDS[S.lang][tierId]).slice(0, 3);
+  let w = 0, solved = 0;
+  const next = () => {
+    if (w >= words.length) return ctx.done([t('spelled', solved, words.length)]);
+    const [word, hint] = words[w++];
+    const chars = [...word];
+    let letters; do { letters = shuffle(chars); } while (letters.join('') === word);
+    const slots = Array(chars.length).fill(null); // tile index per slot
+    const locked = new Set();
+    let hints = 0, busy = false;
+    ctx.stage.innerHTML = `<div class="q-count">${t('wordOf', w, words.length)}</div>
+      ${tierId === 'star' ? `<div class="hint-emoji">${hint}</div>` : `<div class="hint-text">${esc(hint)}</div>`}
+      <div class="slots" id="slots">${slots.map((_, i) => `<button class="slot" data-i="${i}" aria-label="${t('letterN', i + 1)}"></button>`).join('')}</div>
+      ${S.lang === 'ar' ? '<div class="joined" id="joined" aria-live="polite"></div>' : ''}
+      <div class="tiles" id="tiles">${letters.map((l, i) => `<button class="tile" data-t="${i}">${l}</button>`).join('')}</div>
+      <div class="row" style="width:100%;max-width:420px"><button class="btn ghost" id="hint">${t('hint')}</button><button class="btn ghost" id="skip">${t('skip')}</button></div>`;
+    const slotEls = $$('.slot', ctx.stage), tileEls = $$('.tile', ctx.stage);
+    const paint = () => {
+      slotEls.forEach((s, i) => { s.textContent = slots[i] === null ? '' : letters[slots[i]]; s.classList.toggle('locked', locked.has(i)); });
+      tileEls.forEach((el, i) => el.classList.toggle('used', slots.includes(i)));
+    };
+    const finish = ok => {
+      busy = true;
+      const f = ctx.timer.frac(); ctx.timer.stop();
+      if (ok) { solved++; ctx.add(Math.max(5, 20 + Math.round(13 * f) - 5 * hints)); Sound.good(); }
+      else { Sound.bad(); slotEls.forEach((s, i) => { s.textContent = chars[i]; }); }
+      $('#slots').classList.add('ok');
+      const joined = $('#joined'); if (joined) joined.textContent = word; // shows the letters connected
+      ctx.later(next, ok ? 1100 : 1900);
+    };
+    const check = () => {
+      if (slots.includes(null)) return;
+      if (slots.map(i => letters[i]).join('') === word) return finish(true);
+      busy = true; Sound.bad(); buzz(60);
+      $('#slots').classList.add('no');
+      ctx.later(() => { $('#slots').classList.remove('no'); slots.forEach((_, i) => { if (!locked.has(i)) slots[i] = null; }); busy = false; paint(); }, 450);
+    };
+    const giveLetter = () => {
+      const pos = chars.findIndex((_, i) => !locked.has(i));
+      if (pos < 0) return;
+      slots.forEach((_, i) => { if (!locked.has(i)) slots[i] = null; });
+      slots[pos] = letters.findIndex((l, i) => l === chars[pos] && !slots.includes(i));
+      locked.add(pos); paint();
+    };
+    tileEls.forEach((el, i) => el.onclick = () => {
+      if (busy || slots.includes(i)) return;
+      const s = slots.indexOf(null); if (s < 0) return;
+      slots[s] = i; Sound.tap(); paint(); check();
+    });
+    slotEls.forEach((s, i) => s.onclick = () => { if (busy || locked.has(i) || slots[i] === null) return; slots[i] = null; Sound.flip(); paint(); });
+    $('#hint').onclick = () => { if (busy || locked.size >= chars.length - 1) return; hints++; giveLetter(); Sound.tap(); check(); };
+    $('#skip').onclick = () => { if (!busy) finish(false); };
+    if (tierId === 'star') giveLetter(); // free first letter for the youngest
+    paint();
+    ctx.timer.start(time, () => { if (!busy) finish(false); });
+  };
+  next();
+}
+
+/* ---------- Memory Match ---------- */
+const MEM = ['🐶', '🐱', '🦊', '🐼', '🐸', '🐵', '🦁', '🐯', '🐷', '🐙', '🦄', '🐢', '🐧', '🦋', '🍉', '🍓', '🍌', '🚀', '⚽', '🎈', '🌈', '🍩'];
+function memoryGame(ctx) {
+  const cfg = { star: { pairs: 6, cols: 3, time: 100, peek: 2500 }, explorer: { pairs: 8, cols: 4, time: 90, peek: 1200 }, master: { pairs: 10, cols: 4, time: 80, peek: 0 } }[ctx.tier];
+  const faces = shuffle(MEM).slice(0, cfg.pairs);
+  const deck = shuffle([...faces, ...faces]);
+  const rows = deck.length / cfg.cols;
+  ctx.stage.innerHTML = `<div class="q-count" id="mstat">${t('findPairs', cfg.pairs)}</div>
+    <div class="mgrid" style="--cols:${cfg.cols};--rows:${rows}">${deck.map((f, i) => `<button class="card${cfg.peek ? ' up' : ''}" data-i="${i}" aria-label="${t('cardN', i + 1)}"><span class="in"><span class="back"></span><span class="face">${f}</span></span></button>`).join('')}</div>`;
+  const cards = $$('.card', ctx.stage);
+  let open = [], found = 0, moves = 0, busy = true;
+  const end = () => {
+    busy = true;
+    const f = found === cfg.pairs ? ctx.timer.frac() : 0; ctx.timer.stop();
+    const eff = moves ? Math.min(1, cfg.pairs / moves) : 0;
+    ctx.score = 0;
+    ctx.add(50 * found / cfg.pairs + 30 * f + 20 * eff * found / cfg.pairs);
+    if (found < cfg.pairs) { Sound.bad(); cards.forEach(c => c.classList.add('up')); }
+    ctx.done([t('pairsFound', found, cfg.pairs), t('moves', moves)]);
+  };
+  cards.forEach((c, i) => c.onclick = () => {
+    if (busy || c.classList.contains('up') || c.classList.contains('done')) return;
+    c.classList.add('up'); Sound.flip(); open.push(i);
+    if (open.length < 2) return;
+    moves++;
+    const [a, b] = open; open = [];
+    if (deck[a] === deck[b]) {
+      found++;
+      ctx.later(() => { cards[a].classList.add('done'); cards[b].classList.add('done'); Sound.good(); }, 250);
+      $('#mstat').textContent = t('pairsOf', found, cfg.pairs);
+      ctx.add(4);
+      if (found === cfg.pairs) ctx.later(end, 600);
+    } else {
+      busy = true;
+      ctx.later(() => { cards[a].classList.remove('up'); cards[b].classList.remove('up'); busy = false; }, 750);
+    }
+  });
+  const begin = () => { cards.forEach(c => c.classList.remove('up')); busy = false; ctx.timer.start(cfg.time, end); };
+  cfg.peek ? ctx.later(begin, cfg.peek) : begin();
+}
+
+/* ---------- Sharp Eyes ---------- */
+const EYES = {
+  star: [['🐶', '🐱'], ['🍎', '🍌'], ['⚽', '🏀'], ['🚗', '🚌'], ['🌞', '🌙'], ['🐸', '🐢'], ['🍦', '🍩'], ['🐟', '🐙']],
+  explorer: [['😀', '😃'], ['🐻', '🐨'], ['🍊', '🍑'], ['🌲', '🌳'], ['🐭', '🐹'], ['⭐', '🌟'], ['🔵', '🟣'], ['🍏', '🍐'], ['🐝', '🐞']],
+  master: [['🕐', '🕑'], ['😐', '😑'], ['🌑', '🌚'], ['😗', '😙'], ['🕒', '🕓'], ['💛', '🧡'], ['😶', '😐'], ['🟠', '🟡'], ['😊', '☺️'], ['🙁', '😕']],
+};
+function eyesGame(ctx) {
+  const cfg = { star: { sizes: [3, 3, 4, 4, 4], time: 15 }, explorer: { sizes: [4, 4, 5, 5, 5], time: 11 }, master: { sizes: [5, 5, 6, 6, 6], time: 9 } }[ctx.tier];
+  const sets = shuffle(EYES[ctx.tier]);
+  let r = 0, right = 0;
+  const next = () => {
+    if (r >= cfg.sizes.length) return ctx.done([t('spotted', right, cfg.sizes.length)]);
+    const n = cfg.sizes[r], pair = shuffle(sets[r % sets.length]); r++;
+    const odd = rand(0, n * n - 1);
+    ctx.stage.innerHTML = `<div class="q-count">${t('findOdd', r, cfg.sizes.length)}</div>
+      <div class="egrid" style="--n:${n}">${Array.from({ length: n * n }, (_, i) => `<button data-i="${i}">${i === odd ? pair[1] : pair[0]}</button>`).join('')}</div>`;
+    const cells = $$('.egrid button', ctx.stage);
+    let locked = false;
+    const reveal = ok => {
+      locked = true;
+      const f = ctx.timer.frac(); ctx.timer.stop();
+      cells[odd].classList.add('right');
+      if (ok) { right++; ctx.add(10 + Math.round(10 * f)); Sound.good(); } else Sound.bad();
+      ctx.later(next, ok ? 600 : 1300);
+    };
+    cells.forEach((c, i) => c.onclick = () => {
+      if (locked) return;
+      if (i === odd) return reveal(true);
+      c.classList.remove('wrong'); void c.offsetWidth; c.classList.add('wrong');
+      ctx.add(-3); Sound.bad(); buzz(60);
+    });
+    ctx.timer.start(cfg.time, () => reveal(false));
+  };
+  next();
+}
+
+const RUN = {
+  math: ctx => quiz(ctx, tid => pick(MATH[tid])(), { star: 20, explorer: 15, master: 14 }[ctx.tier]),
+  pattern: ctx => quiz(ctx, tid => pick(PATTERN[tid])(), { star: 20, explorer: 18, master: 18 }[ctx.tier]),
+  words: wordGame,
+  memory: memoryGame,
+  eyes: eyesGame,
+};
+
+/* ---------- confetti ---------- */
+function confetti() {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const cv = $('#confetti'), g = cv.getContext('2d');
+  cv.hidden = false;
+  const dpr = window.devicePixelRatio || 1;
+  cv.width = innerWidth * dpr; cv.height = innerHeight * dpr; g.scale(dpr, dpr);
+  const colors = ['#FFC83D', '#FF6A5C', '#36D6A4', '#4AB3FF', '#B48CFF', '#FFF6E6'];
+  const bits = Array.from({ length: 150 }, () => ({
+    x: innerWidth / 2 + (Math.random() - .5) * 120, y: innerHeight * .35,
+    vx: (Math.random() - .5) * 14, vy: -Math.random() * 14 - 4,
+    s: 6 + Math.random() * 7, r: Math.random() * 6, vr: (Math.random() - .5) * .4, c: pick(colors),
+  }));
+  const t0 = performance.now();
+  const frame = now => {
+    g.clearRect(0, 0, innerWidth, innerHeight);
+    bits.forEach(b => {
+      b.vy += .35; b.vx *= .99; b.x += b.vx; b.y += b.vy; b.r += b.vr;
+      g.save(); g.translate(b.x, b.y); g.rotate(b.r); g.fillStyle = b.c; g.fillRect(-b.s / 2, -b.s / 4, b.s, b.s / 2); g.restore();
+    });
+    if (now - t0 < 3500) requestAnimationFrame(frame);
+    else { g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, cv.width, cv.height); cv.hidden = true; }
+  };
+  requestAnimationFrame(frame);
+}
+
+/* ---------- boot ---------- */
+const start = () => { applyLang(); go(home); };
+window.claude?.hot?.ready ? window.claude.hot.ready(start) : start();
+})();
+</script>
+<!--standalone-->
+<script>
+  if ('serviceWorker' in navigator && location.protocol === 'https:') {
+    window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+  }
+</script>
+</body>
+</html>
+<!--/standalone-->
