@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Brain Cup">
+<meta name="apple-mobile-web-app-title" content="Almujalli">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" type="image/svg+xml" href="icons/icon.svg">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -20,7 +20,7 @@
   [hidden] { display: none !important }
 </style>
 <!--/standalone-->
-<title>Family Brain Cup</title>
+<title>Almujalli Family Game</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -182,6 +182,15 @@ main { flex: 1; display: flex; flex-direction: column; gap: 22px; padding-top: 8
 [data-game="pattern"] { --g: var(--coral) }
 [data-game="eyes"] { --g: var(--sun) }
 
+.code-big { font-family: var(--f-display); font-size: clamp(50px, 15vw, 76px); line-height: 1; letter-spacing: .16em; color: var(--sun); direction: ltr }
+.join-row { display: flex; gap: 10px }
+.code-input { flex: 1; min-width: 0; text-align: center; text-transform: uppercase; letter-spacing: .2em; font-family: var(--f-display); direction: ltr }
+:root[lang="ar"] .code-big, :root[lang="ar"] .code-input { letter-spacing: .16em !important }
+.net-msg { margin: 0; min-height: 1.5em; color: var(--coral) }
+.net-msg.ok { color: var(--muted) }
+.lineup .pill.done { box-shadow: inset 0 0 0 2px var(--mint) }
+.lineup .pill.wait { opacity: .5 }
+.host-tag { font-size: 12px; color: var(--muted); margin-inline-start: 4px }
 .install-tip { border: 2px dashed var(--line); border-radius: var(--r); padding: 12px 14px; font-size: 15px; color: var(--muted) }
 .install-tip b { color: var(--ink) }
 
@@ -382,7 +391,7 @@ const store = {
 // Arabic strings use Western digits in the source; they are shown as Arabic-Indic digits on screen (see localize below).
 const L = {
   en: {
-    appName: 'Family Brain Cup',
+    appName: 'Almujalli Family Game',
     tagline: 'Five quick brain games. Everyone plays at their own level, so the youngest can beat the grown-ups.',
     players: 'Players',
     playerCount: n => n === 1 ? '1 player' : `${n} players`,
@@ -430,9 +439,20 @@ const L = {
     findPairs: n => `Find ${n} pairs`, pairsOf: (f, n) => `${f} of ${n} pairs`, pairsFound: (f, n) => `${f} of ${n} pairs found`, moves: m => `${m} moves`, cardN: i => `Card ${i}`,
     findOdd: (r, n) => `Find the different one · ${r} of ${n}`, spotted: (r, n) => `${r} of ${n} spotted`,
     homeBtn: 'Home', soundOn: 'Sound on', soundOff: 'Sound off', switchLang: 'العربية',
+    playOnline: 'Play online', onlineTitle: 'Play online',
+    onlineIntro: 'Everyone plays on their own phone or iPad, wherever they are. One person creates a room and sends the code to the others.',
+    whoAreYou: 'Who are you on this device?', createRoom: 'Create a room', joinTitle: 'Have a code?', joinRoom: 'Join', codePh: 'CODE',
+    connecting: 'Connecting…', codeLength: 'Enter the 5-letter room code.',
+    errNoRoom: 'No room with that code. Check the code and try again.', errNetwork: "Couldn't connect. Check the internet connection and try again.",
+    errStarted: 'That game has already started. Ask the host to start a new game, then join again.', errPreview: 'Online play works from the game link (oss6596.github.io/tadawul), not in this preview.',
+    room: 'Room', roomCode: 'Room code', shareCode: 'Send the code', copied: 'Code copied',
+    shareText: (url, code) => `Join our family game! Open ${url} and tap "Play online", or join with the code ${code}.`,
+    inRoom: 'In the room', hostTag: 'host', waitingHost: 'Waiting for the host to start…', startOnline: 'Start the game', needTwo: 'Waiting for at least one more player.',
+    stillPlaying: 'Still playing', showNow: 'Show scores now', waitNext: 'Waiting for the host…', yourPoints: p => `You scored ${p}`,
+    leaveRoom: 'Leave the room?', hostLeft: 'The host closed the room.', lostConn: 'Lost the connection to the room.', newGame: 'New game in this room',
   },
   ar: {
-    appName: 'كأس الأذكياء',
+    appName: 'لعبة عائلة المجلي',
     tagline: 'خمس ألعاب ذكاء سريعة. كل لاعب يلعب حسب مستواه، لذلك يستطيع الأصغر أن يفوز على الكبار.',
     players: 'اللاعبون',
     playerCount: n => n === 1 ? 'لاعب واحد' : n === 2 ? 'لاعبان' : n <= 10 ? `${n} لاعبين` : `${n} لاعبًا`,
@@ -480,6 +500,17 @@ const L = {
     findPairs: n => `الأزواج المطلوبة: ${n}`, pairsOf: (f, n) => `الأزواج: ${f} من ${n}`, pairsFound: (f, n) => `الأزواج المكتشفة: ${f} من ${n}`, moves: m => `عدد الحركات: ${m}`, cardN: i => `البطاقة ${i}`,
     findOdd: (r, n) => `جد المختلف · ${r} من ${n}`, spotted: (r, n) => `اكتشفت ${r} من ${n}`,
     homeBtn: 'الرئيسية', soundOn: 'الصوت يعمل', soundOff: 'الصوت مغلق', switchLang: 'English',
+    playOnline: 'العب أونلاين', onlineTitle: 'اللعب أونلاين',
+    onlineIntro: 'كل شخص يلعب على جواله أو آيباده أينما كان. شخص واحد ينشئ غرفة ويرسل الرمز للبقية.',
+    whoAreYou: 'من أنت على هذا الجهاز؟', createRoom: 'أنشئ غرفة', joinTitle: 'عندك رمز؟', joinRoom: 'انضم', codePh: 'الرمز',
+    connecting: 'جارٍ الاتصال…', codeLength: 'اكتب رمز الغرفة المكوّن من 5 حروف.',
+    errNoRoom: 'لا توجد غرفة بهذا الرمز. تأكد من الرمز وحاول مرة أخرى.', errNetwork: 'تعذّر الاتصال. تأكد من الإنترنت وحاول مرة أخرى.',
+    errStarted: 'بدأت هذه اللعبة بالفعل. اطلب من صاحب الغرفة بدء لعبة جديدة ثم انضم مرة أخرى.', errPreview: 'اللعب أونلاين يعمل من رابط اللعبة (oss6596.github.io/tadawul) وليس من هذه المعاينة.',
+    room: 'الغرفة', roomCode: 'رمز الغرفة', shareCode: 'أرسل الرمز', copied: 'تم نسخ الرمز',
+    shareText: (url, code) => `انضم إلى لعبة العائلة! افتح ${url} واضغط «العب أونلاين»، أو انضم بالرمز ${code}.`,
+    inRoom: 'في الغرفة', hostTag: 'المضيف', waitingHost: 'بانتظار صاحب الغرفة ليبدأ…', startOnline: 'ابدأ اللعبة', needTwo: 'بانتظار انضمام لاعب آخر على الأقل.',
+    stillPlaying: 'ما زالوا يلعبون', showNow: 'اعرض النتائج الآن', waitNext: 'بانتظار صاحب الغرفة…', yourPoints: p => `نتيجتك ${p}`,
+    leaveRoom: 'الخروج من الغرفة؟', hostLeft: 'أغلق صاحب الغرفة الغرفة.', lostConn: 'انقطع الاتصال بالغرفة.', newGame: 'لعبة جديدة في نفس الغرفة',
   },
 };
 
@@ -602,7 +633,10 @@ function applyLang() {
 }
 
 $('#homeBtn').addEventListener('click', async () => {
-  if (S.cup || S.inPlay) {
+  if (O.peer) {
+    if (!(await ask(t('leaveRoom'), t('leave'), t('keepPlaying')))) return;
+    leaveOnline();
+  } else if (S.cup || S.inPlay) {
     const leave = await ask(S.cup ? t('leaveCup') : t('stopGame'), t('leave'), t('keepPlaying'));
     if (!leave) return;
     S.cup = null;
@@ -661,6 +695,7 @@ function home() {
         <button class="btn" id="practice" ${ps.length ? '' : 'disabled'}>${t('practice')}</button>
         <button class="btn" id="fame">${t('fame')}</button>
       </div>
+      <button class="btn wide" id="online" ${ps.length ? '' : 'disabled'}>${t('playOnline')}</button>
       <button class="btn ghost" id="installBtn" ${installEvt ? '' : 'hidden'}>${t('install')}</button>
       ${showIOSTip ? `<div class="install-tip">${t('iosTip')}</div>` : ''}
     </div>
@@ -682,6 +717,7 @@ function home() {
   $('#startCup').onclick = () => go(cupSetup);
   $('#practice').onclick = () => go(practiceSetup);
   $('#fame').onclick = () => go(hallOfFame);
+  $('#online').onclick = () => go(onlineMenu);
   $('#installBtn').onclick = async () => { if (!installEvt) return; installEvt.prompt(); await installEvt.userChoice.catch(() => {}); installEvt = null; $('#installBtn').hidden = true; };
 }
 
@@ -815,16 +851,32 @@ function turnResult(p, score, detail) {
 
 const ranked = () => S.cup.ids.map(byId).sort((a, b) => S.cup.scores[b.id] - S.cup.scores[a.id]);
 
+const standingsHtml = (list, scores, pts) => {
+  const top = Math.max(1, ...list.map(p => scores[p.id]));
+  return `<div class="standings">${list.map((p, i) => `<div class="stand" data-tier="${p.tier}">
+      <span class="rank">${i + 1}</span>${avatarHtml(p)}
+      <span class="bar-wrap"><span class="nm" dir="auto">${esc(p.name)}</span><span class="track"><i style="width:${(scores[p.id] / top) * 100}%"></i></span></span>
+      <span class="sc">${scores[p.id]}<small dir="ltr">+${pts[p.id] || 0}</small></span></div>`).join('')}</div>`;
+};
+const podiumHtml = (list, scores) => {
+  const rankOf = p => 1 + list.filter(q => scores[q.id] > scores[p.id]).length;
+  const winners = list.filter(p => scores[p.id] === scores[list[0].id]);
+  const steps = [list[1], list[0], list[2]].map((p, i) => p ? `<div class="step p${[2, 1, 3][i]}" data-tier="${p.tier}">
+      ${avatarHtml(p)}<span class="nm" dir="auto">${esc(p.name)}</span><span class="sc">${scores[p.id]}</span>
+      <span class="block">${rankOf(p)}</span></div>` : '').join('');
+  return `<span class="eyebrow">${winners.length > 1 ? t('shared') : t('goesTo')}</span>
+    <h2 dir="auto" style="color:var(--sun)">${winners.map(p => esc(p.name)).join(t('and'))}</h2>
+    <div class="podium">${steps}</div>
+    ${list.length > 3 ? `<p>${list.slice(3).map(p => `${esc(p.name)} ${scores[p.id]}`).join(' · ')}</p>` : ''}`;
+};
+
 function roundScores() {
   const c = S.cup, last = c.round + 1 >= c.order.length;
-  const list = ranked(), top = Math.max(1, ...list.map(p => c.scores[p.id]));
+  const list = ranked();
   setTitle(t('afterRound', c.round + 1, c.order.length));
   app.innerHTML = `<div class="center">
     <h2>${t('scoreboard')}</h2>
-    <div class="standings">${list.map((p, i) => `<div class="stand" data-tier="${p.tier}">
-      <span class="rank">${i + 1}</span>${avatarHtml(p)}
-      <span class="bar-wrap"><span class="nm" dir="auto">${esc(p.name)}</span><span class="track"><i style="width:${(c.scores[p.id] / top) * 100}%"></i></span></span>
-      <span class="sc">${c.scores[p.id]}<small dir="ltr">+${c.roundPts[p.id] || 0}</small></span></div>`).join('')}</div>
+    ${standingsHtml(list, c.scores, c.roundPts)}
     <button class="btn primary big" id="go">${last ? t('crown') : t('nextRound', c.round + 2, game(c.order[c.round + 1]).name)}</button></div>`;
   $('#go').onclick = () => {
     if (last) go(finale);
@@ -835,21 +887,12 @@ function roundScores() {
 function finale() {
   const c = S.cup, list = ranked();
   const best = c.scores[list[0].id];
-  const winners = list.filter(p => c.scores[p.id] === best);
-  const rankOf = p => 1 + list.filter(q => c.scores[q.id] > c.scores[p.id]).length;
   list.forEach(p => { p.stats.played++; });
-  winners.forEach(p => { p.stats.cups++; });
+  list.filter(p => c.scores[p.id] === best).forEach(p => { p.stats.cups++; });
   savePlayers();
   setTitle(t('cupFinished'));
-  const podium = [list[1], list[0], list[2]].map((p, i) => p ? `<div class="step p${[2, 1, 3][i]}" data-tier="${p.tier}">
-      ${avatarHtml(p)}<span class="nm" dir="auto">${esc(p.name)}</span><span class="sc">${c.scores[p.id]}</span>
-      <span class="block">${rankOf(p)}</span></div>` : '').join('');
-  const names = winners.map(p => esc(p.name)).join(t('and'));
   app.innerHTML = `<div class="center">
-    <span class="eyebrow">${winners.length > 1 ? t('shared') : t('goesTo')}</span>
-    <h2 dir="auto" style="color:var(--sun)">${names}</h2>
-    <div class="podium">${podium}</div>
-    ${list.length > 3 ? `<p>${list.slice(3).map(p => `${esc(p.name)} ${c.scores[p.id]}`).join(' · ')}</p>` : ''}
+    ${podiumHtml(list, c.scores)}
     <div class="row" style="width:100%;max-width:520px">
       <button class="btn" id="home2">${t('home')}</button>
       <button class="btn primary" id="again">${t('playAgain')}</button>
@@ -1234,6 +1277,340 @@ const RUN = {
   eyes: eyesGame,
 };
 
+/* ================= ONLINE ================= */
+// Peer-to-peer rooms over WebRTC (PeerJS, bundled in vendor/). The host's device runs the game;
+// guests connect to it with a 5-letter room code and every device plays the same game each round.
+const ROOM_PREFIX = 'almujalli-fg-';
+const CODE_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+const newCode = () => Array.from({ length: 5 }, () => CODE_CHARS[rand(0, CODE_CHARS.length - 1)]).join('');
+// ?peer=host:port points at a self-hosted PeerJS server (used for testing); the default is the free PeerJS cloud.
+const peerOptions = () => {
+  const m = /[?&]peer=([^&:]+):(\d+)/.exec(location.search);
+  return m ? { host: m[1], port: +m[2], path: '/', secure: false } : {};
+};
+let peerLib = null;
+const loadPeer = () => peerLib || (peerLib = new Promise((res, rej) => {
+  if (window.Peer) return res(window.Peer);
+  const sc = document.createElement('script');
+  sc.src = 'vendor/peerjs.min.js';
+  sc.onload = () => window.Peer ? res(window.Peer) : rej({ type: 'network' });
+  sc.onerror = () => { peerLib = null; rej({ type: 'network' }); };
+  document.head.append(sc);
+}));
+const openPeer = (Peer, id) => new Promise((res, rej) => {
+  const p = id ? new Peer(id, peerOptions()) : new Peer(peerOptions());
+  let settled = false;
+  const fail = e => { if (settled) return; settled = true; clearTimeout(timer); p.destroy(); rej(e); };
+  const timer = setTimeout(() => fail({ type: 'network' }), 15000);
+  p.on('open', () => { if (settled) return; settled = true; clearTimeout(timer); res(p); });
+  p.on('error', fail);
+});
+
+const O = { peer: null };
+const resetOnline = () => Object.assign(O, {
+  peer: null, host: false, code: '', me: null, conns: new Map(), hostConn: null, players: [],
+  rounds: 5, order: [], round: -1, scores: {}, roundPts: {}, done: new Set(), inbox: {}, boardRound: -1,
+  phase: 'lobby', view: '', myLast: 0, statsDone: false, leaving: false, pendingCode: O.pendingCode || '', error: '',
+});
+resetOnline();
+
+const summary = p => ({ id: p.id, name: p.name, avatar: p.avatar, tier: p.tier });
+const cleanPlayer = p => ({
+  id: String(p && p.id || uid()).slice(0, 16),
+  name: String(p && p.name || '?').slice(0, 14),
+  avatar: AVATARS.includes(p && p.avatar) ? p.avatar : '🙂',
+  tier: TIER_IDS.includes(p && p.tier) ? p.tier : 'explorer',
+  online: true,
+});
+const activePlayers = () => O.players.filter(p => p.online !== false);
+const onlineRanked = () => [...O.players].sort((a, b) => (O.scores[b.id] || 0) - (O.scores[a.id] || 0));
+
+/* host side */
+async function hostRoom(me) {
+  const Peer = await loadPeer();
+  let peer = null, code = '';
+  for (let i = 0; i < 4 && !peer; i++) {
+    code = newCode();
+    try { peer = await openPeer(Peer, ROOM_PREFIX + code); }
+    catch (e) { if (e.type !== 'unavailable-id') throw e; }
+  }
+  if (!peer) throw { type: 'network' };
+  Object.assign(O, { peer, code, host: true, me, players: [{ ...summary(me), online: true }], phase: 'lobby' });
+  peer.on('connection', conn => {
+    conn.on('data', msg => hostReceive(conn, msg));
+    conn.on('close', () => hostDrop(conn));
+    conn.on('error', () => hostDrop(conn));
+  });
+  // Keep the room code registered with the broker if the signalling socket drops.
+  peer.on('disconnected', () => { if (O.peer === peer && !peer.destroyed) peer.reconnect(); });
+}
+const broadcast = msg => O.conns.forEach(c => { if (c.conn.open) c.conn.send(msg); });
+const share = msg => { broadcast(msg); applyOnline(msg); };
+const shareRoster = () => share({ t: 'roster', players: O.players });
+
+function hostReceive(conn, msg) {
+  if (!msg || typeof msg !== 'object') return;
+  if (msg.t === 'hello') {
+    if (O.phase !== 'lobby') { conn.send({ t: 'reject', reason: 'started' }); setTimeout(() => conn.close(), 800); return; }
+    const p = cleanPlayer(msg.player);
+    O.conns.set(conn.peer, { conn, id: p.id });
+    O.players = O.players.filter(x => x.id !== p.id).concat(p);
+    Sound.good();
+    shareRoster();
+  } else if (msg.t === 'score') {
+    const c = O.conns.get(conn.peer);
+    if (c) recordScore(c.id, msg.r, msg.score);
+  }
+}
+function hostDrop(conn) {
+  const c = O.conns.get(conn.peer);
+  if (!c) return;
+  O.conns.delete(conn.peer);
+  if (O.phase === 'lobby') O.players = O.players.filter(p => p.id !== c.id);
+  else O.players.forEach(p => { if (p.id === c.id) p.online = false; });
+  shareRoster();
+  if (O.phase === 'playing') checkRoundDone();
+}
+function recordScore(id, r, score) {
+  if (r !== O.round || O.boardRound === r || id in O.inbox) return;
+  O.inbox[id] = Math.max(0, Math.min(100, Math.round(+score || 0)));
+  share({ t: 'done', id });
+  checkRoundDone();
+}
+function checkRoundDone() {
+  if (O.boardRound === O.round || O.round < 0) return;
+  if (activePlayers().every(p => p.id in O.inbox)) closeRound();
+}
+function closeRound() {
+  const scores = { ...O.scores }, roundPts = {};
+  O.players.forEach(p => { roundPts[p.id] = O.inbox[p.id] || 0; scores[p.id] = (scores[p.id] || 0) + roundPts[p.id]; });
+  share({ t: 'board', r: O.round, scores, roundPts });
+}
+function hostStart() {
+  const order = []; let pool = [];
+  for (let r = 0; r < O.rounds; r++) { if (!pool.length) pool = shuffle(GAME_IDS); order.push(pool.pop()); }
+  share({ t: 'start', order, players: O.players });
+  share({ t: 'round', r: 0 });
+}
+
+/* guest side */
+async function joinRoom(code, me) {
+  const Peer = await loadPeer();
+  const peer = await openPeer(Peer, null);
+  Object.assign(O, { peer, code, host: false, me, players: [], phase: 'lobby' });
+  await new Promise((res, rej) => {
+    const timer = setTimeout(() => rej({ type: 'network' }), 15000);
+    peer.on('error', e => { clearTimeout(timer); rej(e); }); // 'peer-unavailable' means no such room
+    const conn = peer.connect(ROOM_PREFIX + code, { reliable: true });
+    conn.on('open', () => { clearTimeout(timer); O.hostConn = conn; conn.send({ t: 'hello', player: summary(me) }); res(); });
+    conn.on('data', guestReceive);
+    conn.on('close', () => lostRoom('lostConn'));
+  });
+}
+function guestReceive(msg) {
+  if (!msg || typeof msg !== 'object') return;
+  if (msg.t === 'reject') { const code = O.code; leaveOnline(); O.error = 'errStarted'; O.pendingCode = code; go(onlineMenu); return; }
+  if (msg.t === 'bye') { lostRoom('hostLeft'); return; }
+  applyOnline(msg);
+}
+function lostRoom(reason) {
+  if (O.leaving || !O.peer) return;
+  leaveOnline();
+  go(() => {
+    setTitle(t('onlineTitle'));
+    app.innerHTML = `<div class="center"><h2>${t(reason)}</h2>
+      <button class="btn primary big" id="go">${t('home')}</button></div>`;
+    $('#go').onclick = () => go(home);
+  });
+}
+function leaveOnline() {
+  if (!O.peer) return;
+  O.leaving = true;
+  const peer = O.peer;
+  if (O.host) { broadcast({ t: 'bye' }); setTimeout(() => peer.destroy(), 400); }
+  else { try { O.hostConn && O.hostConn.close(); } catch { /* already closed */ } peer.destroy(); }
+  resetOnline();
+}
+
+/* state shared by host and guests: every change arrives as a message */
+function applyOnline(msg) {
+  switch (msg.t) {
+    case 'roster':
+      O.players = (msg.players || []).map(p => ({ ...cleanPlayer(p), online: p.online !== false }));
+      if (O.view === 'lobby') go(onlineLobby);
+      else if (O.view === 'waiting') go(onlineWaiting);
+      break;
+    case 'start':
+      O.order = (msg.order || []).filter(g => GAME_IDS.includes(g));
+      O.players = (msg.players || O.players).map(p => ({ ...cleanPlayer(p), online: p.online !== false }));
+      O.scores = Object.fromEntries(O.players.map(p => [p.id, 0]));
+      Object.assign(O, { phase: 'playing', round: -1, boardRound: -1, statsDone: false });
+      break;
+    case 'round':
+      Object.assign(O, { round: msg.r, done: new Set(), inbox: {}, roundPts: {} });
+      go(onlineIntro);
+      break;
+    case 'done':
+      O.done.add(msg.id);
+      if (O.view === 'waiting') go(onlineWaiting);
+      break;
+    case 'board':
+      Object.assign(O, { boardRound: msg.r, scores: msg.scores || O.scores, roundPts: msg.roundPts || {} });
+      if (O.view === 'waiting' || O.view === 'intro') go(onlineBoard);
+      break;
+    case 'final':
+      O.phase = 'final';
+      go(onlineFinal);
+      break;
+    case 'lobby':
+      O.phase = 'lobby';
+      O.players = O.players.filter(p => p.online !== false);
+      go(onlineLobby);
+      break;
+  }
+}
+
+/* screens */
+function onlineMenu() {
+  setTitle(t('onlineTitle'));
+  O.view = 'menu';
+  let who = store.get('onlineMe', null);
+  if (!byId(who)) who = S.players[0].id;
+  app.innerHTML = `
+    <p class="muted" style="margin:0">${t('onlineIntro')}</p>
+    <section class="section"><span class="eyebrow">${t('whoAreYou')}</span>
+      <div class="pick-players" id="pp">${S.players.map(p => `<button data-id="${p.id}" data-tier="${p.tier}" aria-pressed="${p.id === who}">${avatarHtml(p)}<span dir="auto">${esc(p.name)}</span></button>`).join('')}</div>
+    </section>
+    <button class="btn primary big wide" id="create">${t('createRoom')}</button>
+    <section class="section"><span class="eyebrow">${t('joinTitle')}</span>
+      <form class="join-row" id="jf" autocomplete="off">
+        <input class="input code-input" id="code" maxlength="5" autocapitalize="characters" autocorrect="off" spellcheck="false" placeholder="${esc(t('codePh'))}" value="${esc(O.pendingCode)}">
+        <button class="btn" type="submit" id="join">${t('joinRoom')}</button>
+      </form>
+    </section>
+    <p class="net-msg" id="netMsg" role="status">${O.error ? t(O.error) : ''}</p>`;
+  O.error = '';
+  const msg = (text, ok) => { const el = $('#netMsg'); el.textContent = text; el.classList.toggle('ok', !!ok); };
+  const busy = on => ['#create', '#join', '#code'].forEach(sel => { $(sel).disabled = on; });
+  const fail = e => {
+    busy(false);
+    if (O.peer) leaveOnline();
+    msg(e && e.type === 'peer-unavailable' ? t('errNoRoom') : t('errNetwork'));
+  };
+  $$('#pp button').forEach(b => b.onclick = () => { who = b.dataset.id; store.set('onlineMe', who); $$('#pp button').forEach(x => x.setAttribute('aria-pressed', String(x === b))); Sound.tap(); });
+  $('#create').onclick = async () => {
+    if (inFrame) return msg(t('errPreview'));
+    busy(true); msg(t('connecting'), true);
+    try { await hostRoom(byId(who)); go(onlineLobby); } catch (e) { fail(e); }
+  };
+  $('#jf').addEventListener('submit', async e => {
+    e.preventDefault();
+    if (inFrame) return msg(t('errPreview'));
+    const code = $('#code').value.toUpperCase().replace(/[^A-Z]/g, '');
+    if (code.length !== 5) return msg(t('codeLength'));
+    busy(true); msg(t('connecting'), true);
+    try { await joinRoom(code, byId(who)); O.pendingCode = ''; go(onlineLobby); } catch (err) { fail(err); }
+  });
+}
+
+function onlineLobby() {
+  O.view = 'lobby';
+  setTitle(t('room'));
+  const ps = O.players;
+  app.innerHTML = `<div class="center">
+    <span class="eyebrow">${t('roomCode')}</span>
+    <div class="code-big" id="roomCode">${O.code}</div>
+    ${O.host ? `<button class="btn" id="shareBtn">${t('shareCode')}</button>` : ''}
+    <span class="eyebrow">${t('inRoom')}</span>
+    <div class="lineup">${ps.map((p, i) => `<span class="pill">${avatarHtml(p)}<span dir="auto">${esc(p.name)}</span>${i === 0 ? `<span class="host-tag">${t('hostTag')}</span>` : ''}</span>`).join('')}</div>
+    ${O.host ? `
+      <div class="seg numbers" id="rs" style="width:100%;max-width:520px">${[3, 5, 7].map((n, i) => `<button data-n="${n}" aria-pressed="${n === O.rounds}"><b>${n}</b><small>${t('roundTime')[i]}</small></button>`).join('')}</div>
+      <button class="btn primary big" id="start" ${ps.length > 1 ? '' : 'disabled'}>${t('startOnline')}</button>
+      ${ps.length > 1 ? '' : `<p>${t('needTwo')}</p>`}`
+    : `<p>${t('waitingHost')}</p>`}
+  </div>`;
+  if (!O.host) return;
+  $$('#rs button').forEach(b => b.onclick = () => { O.rounds = +b.dataset.n; $$('#rs button').forEach(x => x.setAttribute('aria-pressed', String(x === b))); Sound.tap(); });
+  $('#start').onclick = hostStart;
+  $('#shareBtn').onclick = async () => {
+    const url = location.origin + location.pathname;
+    const text = t('shareText', url + '#join-' + O.code, O.code);
+    try { if (navigator.share) { await navigator.share({ text }); return; } } catch (e) { if (e && e.name === 'AbortError') return; }
+    try { await navigator.clipboard.writeText(text); $('#shareBtn').textContent = t('copied'); }
+    catch { const r = document.createRange(); r.selectNodeContents($('#roomCode')); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); }
+  };
+}
+
+function onlineIntro() {
+  O.view = 'intro';
+  const r = O.round, gid = O.order[r], g = game(gid);
+  setTitle(t('roundOf', r + 1, O.order.length));
+  app.innerHTML = `<div class="center" data-game="${gid}">
+    <span class="eyebrow">${t('round', r + 1)}</span>
+    <div class="big-icon">${g.icon}</div>
+    <h2>${g.name}</h2>
+    <p>${g.how} ${t('ownLevel')}</p>
+    <button class="btn primary big" id="go">${t('ready')}</button></div>`;
+  $('#go').onclick = () => {
+    O.view = 'play';
+    go(playGame, gid, O.me, score => {
+      O.myLast = score;
+      O.view = 'waiting';
+      if (O.host) recordScore(O.me.id, r, score);
+      else if (O.hostConn && O.hostConn.open) O.hostConn.send({ t: 'score', r, score });
+      if (O.view === 'waiting') go(O.boardRound === r ? onlineBoard : onlineWaiting);
+    });
+  };
+}
+
+function onlineWaiting() {
+  O.view = 'waiting';
+  setTitle(t('roundOf', O.round + 1, O.order.length));
+  const ps = activePlayers();
+  const waiting = ps.filter(p => !O.done.has(p.id));
+  app.innerHTML = `<div class="center">
+    <span class="eyebrow">${t('yourPoints', O.myLast)}</span>
+    <h2>${t('stillPlaying')}</h2>
+    <div class="lineup">${ps.map(p => `<span class="pill ${O.done.has(p.id) ? 'done' : 'wait'}">${avatarHtml(p)}<span dir="auto">${esc(p.name)}</span></span>`).join('')}</div>
+    ${O.host && waiting.length ? `<button class="btn" id="now">${t('showNow')}</button>` : ''}
+  </div>`;
+  if (O.host && waiting.length) $('#now').onclick = closeRound;
+}
+
+function onlineBoard() {
+  O.view = 'board';
+  const last = O.round + 1 >= O.order.length;
+  setTitle(t('afterRound', O.round + 1, O.order.length));
+  app.innerHTML = `<div class="center">
+    <h2>${t('scoreboard')}</h2>
+    ${standingsHtml(onlineRanked(), O.scores, O.roundPts)}
+    ${O.host ? `<button class="btn primary big" id="go">${last ? t('crown') : t('nextRound', O.round + 2, game(O.order[O.round + 1]).name)}</button>` : `<p>${t('waitNext')}</p>`}
+  </div>`;
+  if (O.host) $('#go').onclick = () => share(last ? { t: 'final' } : { t: 'round', r: O.round + 1 });
+}
+
+function onlineFinal() {
+  O.view = 'final';
+  const list = onlineRanked();
+  const best = O.scores[list[0].id] || 0;
+  if (!O.statsDone) {
+    O.statsDone = true;
+    const me = byId(O.me.id);
+    if (me) { me.stats.played++; if ((O.scores[me.id] || 0) === best) me.stats.cups++; savePlayers(); }
+  }
+  setTitle(t('cupFinished'));
+  app.innerHTML = `<div class="center">
+    ${podiumHtml(list, O.scores)}
+    <div class="row" style="width:100%;max-width:520px">
+      <button class="btn" id="home2">${t('home')}</button>
+      ${O.host ? `<button class="btn primary" id="again">${t('newGame')}</button>` : ''}
+    </div>
+    ${O.host ? '' : `<p>${t('waitNext')}</p>`}</div>`;
+  Sound.win(); confetti();
+  $('#home2').onclick = () => { leaveOnline(); go(home); };
+  if (O.host) $('#again').onclick = () => share({ t: 'lobby' });
+}
+
 /* ---------- confetti ---------- */
 function confetti() {
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
@@ -1261,7 +1638,12 @@ function confetti() {
 }
 
 /* ---------- boot ---------- */
-const start = () => { applyLang(); go(home); };
+const start = () => {
+  applyLang();
+  const m = /^#join-([A-Z]{5})$/.exec(location.hash);
+  if (m) { O.pendingCode = m[1]; history.replaceState(null, '', location.pathname + location.search); }
+  go(m && S.players.length ? onlineMenu : home);
+};
 window.claude?.hot?.ready ? window.claude.hot.ready(start) : start();
 })();
 </script>

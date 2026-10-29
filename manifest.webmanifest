@@ -1,7 +1,7 @@
 {
-  "name": "Family Brain Cup",
-  "short_name": "Brain Cup",
-  "description": "Five quick brain games for the whole family. Everyone plays at their own level.",
+  "name": "Almujalli Family Game",
+  "short_name": "Almujalli",
+  "description": "Brain games for the Almujalli family, in English and Arabic. Play together on one device or online.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
@@ -9,9 +9,26 @@
   "background_color": "#211A3F",
   "theme_color": "#211A3F",
   "icons": [
-    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
-    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
-    { "src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
-    { "src": "icons/icon.svg", "sizes": "any", "type": "image/svg+xml" }
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
   ]
 }

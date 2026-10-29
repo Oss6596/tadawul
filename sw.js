@@ -1,6 +1,6 @@
 // Offline support: cache the game shell on install, then serve cache-first.
 // Bump VERSION whenever you change index.html so devices pick up the new game.
-const VERSION = 'brain-cup-v2';
+const VERSION = 'almujalli-v3';
 const SHELL = [
   './',
   'index.html',
@@ -9,6 +9,7 @@ const SHELL = [
   'icons/icon-192.png',
   'icons/icon-512.png',
   'icons/apple-touch-icon.png',
+  'vendor/peerjs.min.js',
 ];
 
 self.addEventListener('install', e => {

@@ -1,4 +1,4 @@
-# Family Brain Cup / كأس الأذكياء
+# Almujalli Family Game · لعبة عائلة المجلي
 
 Play: https://oss6596.github.io/tadawul/
 
