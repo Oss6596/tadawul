@@ -1,4 +1,6 @@
-# Family Brain Cup
+# Almujalli Family Game · لعبة عائلة المجلي
+
+Live: https://oss6596.github.io/tadawul/
 
 A family brain-games app for iPad, iPhone and Android. Everyone plays the same five games at their own level,
 so a 6-year-old, an 11-year-old and the adults can compete fairly for the cup.
@@ -15,6 +17,12 @@ Each turn scores up to 100 points, with bonus points for speed.
 **Modes**
 
 * **Family cup**: 3, 5 or 7 rounds. Pass the device between players, see the scoreboard after each round, and finish on a podium.
+* **Play online**: everyone plays on their own phone or iPad, wherever they are. One person taps **Create a room**
+  and sends the 5-letter code (or the join link) to the others, who tap **Join**. Each round everyone plays the same game
+  at their own level at the same time, and all devices show the scoreboard and the final podium.
+  Devices connect directly to each other (WebRTC, using the bundled [PeerJS](https://peerjs.com) library and its free
+  connection and relay servers), so there is no server to run or pay for. Scores never leave the players' devices except to
+  reach the other players in the room.
 * **Practice**: one player, one game, tracking personal bests.
 * **Hall of fame**: cups won and each player's best score in every game.
 
@@ -24,7 +32,7 @@ The game starts in Arabic on devices set to Arabic.
 
 Players (name, age, animal avatar) and scores are saved on the device.
 
-It is a plain web app (HTML + JavaScript, no build step). It works offline once it has been opened,
+It is a plain web app (HTML + JavaScript, no build step). Everything except online play works offline once it has been opened,
 and it can be installed to the home screen like a normal app.
 
 ## Try it locally
@@ -75,7 +83,7 @@ Open the link once on each device, then:
 It gets its own icon, opens full screen without the browser bar, and works without internet.
 Each device keeps its own players and trophies.
 
-**Updating:** after changing `index.html`, bump `VERSION` in `sw.js` (for example `brain-cup-v2`) before publishing.
+**Updating:** after changing `index.html`, bump `VERSION` in `sw.js` (for example `almujalli-v4`) before publishing.
 Devices pick up the new version the next time the game is opened twice.
 
 ## Optional: real App Store / Play Store apps
@@ -85,7 +93,7 @@ store apps, wrap the same folder with [Capacitor](https://capacitorjs.com):
 
 ```bash
 npm i @capacitor/core @capacitor/cli @capacitor/android @capacitor/ios
-npx cap init "Family Brain Cup" com.yourname.braincup --web-dir family-game
+npx cap init "Almujalli Family Game" com.almujalli.familygame --web-dir family-game
 npx cap add android && npx cap add ios
 npx cap sync
 npx cap open android   # Android Studio → Build → Build APK (install the APK on Android devices directly)
